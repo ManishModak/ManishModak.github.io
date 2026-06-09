@@ -130,7 +130,7 @@
 
   // Active nav link highlight
   function initActiveNav() {
-    const sections = document.querySelectorAll('section[id]');
+    const sections = document.querySelectorAll('section[id], .scroll-section[id]');
     const navLinks = document.querySelectorAll('.nav-link');
 
     if (!sections.length || !navLinks.length) return;

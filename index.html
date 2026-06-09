@@ -77,12 +77,14 @@
       </div>
     </section>
 
-    <!-- About -->
+    <!-- About / Info Section -->
     <section id="about">
-      <div class="section-inner">
-        <span class="section-label reveal">01 / About</span>
-        <h2 class="section-title reveal">About Me</h2>
-        <div class="about-grid">
+      <div class="section-inner info-grid">
+        
+        <!-- Left Column: About Me -->
+        <div class="info-col-left">
+          <span class="section-label reveal">01 / About</span>
+          <h2 class="section-title reveal">About Me</h2>
           <div class="about-text-column reveal">
             <p class="about-lead">I build software driven by real-world purpose. Rather than memorizing templates, I go deep into solving actual problems.</p>
             <p>I don't grind LeetCode, though I respect those who do. It's a solid way to sharpen problem-solving when you're actually thinking through the logic, not just memorizing patterns. My approach is different: I learn best when there's a real goal behind it. Give me a reason to pick something up and I'll go deep. Without that, I'd rather spend the time building something that matters to me.</p>
@@ -133,6 +135,74 @@
             </div>
 
           </div>
+        </div>
+
+        <!-- Right Column: Stack & Contact -->
+        <div class="info-col-right">
+          
+          <!-- Tech Stack Row -->
+          <div id="stack" class="scroll-section">
+            <span class="section-label reveal">04 / Stack</span>
+            <h2 class="section-title reveal">Tech Stack</h2>
+            <div class="tech-pills">
+              <span class="tech-pill">Flutter</span>
+              <span class="tech-pill">Dart</span>
+              <span class="tech-pill">Python</span>
+              <span class="tech-pill">Firebase</span>
+              <span class="tech-pill">Node.js</span>
+              <span class="tech-pill">React</span>
+              <span class="tech-pill">PostgreSQL</span>
+              <span class="tech-pill">Git</span>
+            </div>
+          </div>
+
+          <!-- Contact Row -->
+          <div id="contact" class="scroll-section">
+            <span class="section-label reveal">05 / Connect</span>
+            <h2 class="section-title reveal">Get in Touch</h2>
+            <div class="contact-grid">
+              <a href="https://linkedin.com/in/manish-modak-dev" target="_blank" rel="noopener" class="contact-item reveal" id="contact-linkedin">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+                <div>
+                  <span class="contact-label">LinkedIn</span>
+                  manish-modak-dev
+                </div>
+              </a>
+
+              <a href="mailto:manishm.techdev@gmail.com" class="contact-item reveal" id="contact-email">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                <div>
+                  <span class="contact-label">Email</span>
+                  manishm.techdev@gmail.com
+                </div>
+              </a>
+
+              <a href="https://github.com/ManishModak" target="_blank" rel="noopener" class="contact-item reveal" id="contact-github">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                <div>
+                  <span class="contact-label">GitHub</span>
+                  @ManishModak
+                </div>
+              </a>
+
+              <a href="https://www.kaggle.com/manishmodak" target="_blank" rel="noopener" class="contact-item reveal" id="contact-kaggle">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.825 23.859a.848.848 0 0 1-.424-.107L12.32 19.2l-1.484 1.537.022 4.124a.848.848 0 0 1-.533.784.85.85 0 0 1-.936-.183L6.863 22.93a.848.848 0 0 1-.248-.6V.848A.848.848 0 0 1 7.463 0h1.696a.85.85 0 0 1 .605.252l8.598 8.598a.848.848 0 0 1-.001 1.2l-3.97 3.957 5.83 5.83a.848.848 0 0 1-.396 1.422z"/></svg>
+                <div>
+                  <span class="contact-label">Kaggle</span>
+                  manishmodak
+                </div>
+              </a>
+
+              <a href="https://twitter.com/techdevmanish" target="_blank" rel="noopener" class="contact-item reveal" id="contact-twitter">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                <div>
+                  <span class="contact-label">Twitter/X</span>
+                  @techdevmanish
+                </div>
+              </a>
+            </div>
+          </div>
+
         </div>
       </div>
     </section>
@@ -299,75 +369,6 @@
             <span class="other-project-link">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
             </span>
-          </a>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- Tech Stack -->
-    <section id="stack">
-      <div class="section-inner">
-        <span class="section-label reveal">05 / Stack</span>
-        <h2 class="section-title reveal">Tech Stack</h2>
-        <div class="tech-pills">
-          <span class="tech-pill">Flutter</span>
-          <span class="tech-pill">Dart</span>
-          <span class="tech-pill">Python</span>
-          <span class="tech-pill">Firebase</span>
-          <span class="tech-pill">Node.js</span>
-          <span class="tech-pill">React</span>
-          <span class="tech-pill">PostgreSQL</span>
-          <span class="tech-pill">Git</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- Contact -->
-    <section id="contact">
-      <div class="section-inner">
-        <span class="section-label reveal">06 / Connect</span>
-        <h2 class="section-title reveal">Get in Touch</h2>
-        <div class="contact-grid">
-
-          <a href="https://linkedin.com/in/manish-modak-dev" target="_blank" rel="noopener" class="contact-item reveal" id="contact-linkedin">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
-            <div>
-              <span class="contact-label">LinkedIn</span>
-              manish-modak-dev
-            </div>
-          </a>
-
-          <a href="mailto:manishm.techdev@gmail.com" class="contact-item reveal" id="contact-email">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-            <div>
-              <span class="contact-label">Email</span>
-              manishm.techdev@gmail.com
-            </div>
-          </a>
-
-          <a href="https://github.com/ManishModak" target="_blank" rel="noopener" class="contact-item reveal" id="contact-github">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-            <div>
-              <span class="contact-label">GitHub</span>
-              @ManishModak
-            </div>
-          </a>
-
-          <a href="https://www.kaggle.com/manishmodak" target="_blank" rel="noopener" class="contact-item reveal" id="contact-kaggle">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.825 23.859a.848.848 0 0 1-.424-.107L12.32 19.2l-1.484 1.537.022 4.124a.848.848 0 0 1-.533.784.85.85 0 0 1-.936-.183L6.863 22.93a.848.848 0 0 1-.248-.6V.848A.848.848 0 0 1 7.463 0h1.696a.85.85 0 0 1 .605.252l8.598 8.598a.848.848 0 0 1-.001 1.2l-3.97 3.957 5.83 5.83a.848.848 0 0 1-.396 1.422z"/></svg>
-            <div>
-              <span class="contact-label">Kaggle</span>
-              manishmodak
-            </div>
-          </a>
-
-          <a href="https://twitter.com/techdevmanish" target="_blank" rel="noopener" class="contact-item reveal" id="contact-twitter">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-            <div>
-              <span class="contact-label">Twitter/X</span>
-              @techdevmanish
-            </div>
           </a>
 
         </div>
