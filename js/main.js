@@ -16,7 +16,8 @@
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add('revealed');
-            observer.unobserve(entry.target);
+          } else {
+            entry.target.classList.remove('revealed');
           }
         });
       },
@@ -78,13 +79,17 @@
       const observer = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
+            const cards = entry.target.querySelectorAll('.experience-card, .project-card, .other-project-item');
             if (entry.isIntersecting) {
-              const cards = entry.target.querySelectorAll('.experience-card, .project-card, .other-project-item');
               cards.forEach((card, i) => {
                 card.style.transitionDelay = `${i * 120}ms`;
                 card.classList.add('revealed');
               });
-              observer.unobserve(entry.target);
+            } else {
+              cards.forEach((card) => {
+                card.style.transitionDelay = '';
+                card.classList.remove('revealed');
+              });
             }
           });
         },
@@ -102,13 +107,17 @@
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
+          const pills = entry.target.querySelectorAll('.tech-pill');
           if (entry.isIntersecting) {
-            const pills = entry.target.querySelectorAll('.tech-pill');
             pills.forEach((pill, i) => {
               pill.style.transitionDelay = `${i * 60}ms`;
               pill.classList.add('revealed');
             });
-            observer.unobserve(entry.target);
+          } else {
+            pills.forEach((pill) => {
+              pill.style.transitionDelay = '';
+              pill.classList.remove('revealed');
+            });
           }
         });
       },
