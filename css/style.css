@@ -179,6 +179,10 @@ section {
   padding-top: var(--section-gap);
 }
 
+.section-inner--wide {
+  max-width: 1200px;
+}
+
 .section-label {
   font-family: var(--font-mono);
   font-size: 0.75rem;
@@ -325,6 +329,19 @@ section {
   top: 100px;
 }
 
+/* ---------- Combined Work Grid ---------- */
+.work-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 64px;
+  align-items: start;
+}
+
+.work-col {
+  display: flex;
+  flex-direction: column;
+}
+
 .scroll-section {
   scroll-margin-top: 100px;
 }
@@ -424,7 +441,7 @@ section {
   line-height: 1.6;
 }
 
-/* Responsive adjustment for About Section */
+/* Responsive adjustment for About Section & Grids */
 @media (max-width: 860px) {
   .info-grid {
     grid-template-columns: 1fr;
@@ -435,12 +452,26 @@ section {
     position: static;
     gap: 48px;
   }
+
+  .work-grid {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+
+  .experience-list {
+    gap: 20px;
+  }
+
+  .project-grid {
+    gap: 20px;
+  }
 }
 
 /* ---------- Experience Section ---------- */
 .experience-list {
-  display: grid;
-  gap: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
 .experience-card {
@@ -507,8 +538,9 @@ section {
 
 /* ---------- Project Cards ---------- */
 .project-grid {
-  display: grid;
-  gap: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
 .project-card {
