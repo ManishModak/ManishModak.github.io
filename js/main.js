@@ -1,88 +1,407 @@
 /**
- * Main interactions: scroll reveal, smooth scroll, nav behavior.
+ * Main portfolio interactions.
+ *
+ * Responsibilities:
+ * - Render data-driven cards from js/project-details.js.
+ * - Manage scroll reveal, active navigation, and smooth scrolling.
+ * - Render the full-screen detail view without injecting untrusted text as HTML.
+ * - Manage media lightbox, focus restoration, keyboard access, and history state.
  */
-
 (function () {
   'use strict';
 
-  // Scroll reveal using IntersectionObserver
-  function initScrollReveal() {
-    const elements = document.querySelectorAll('.reveal');
+  const ICONS = {
+    github: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>',
+    demo: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0C.488 3.45.029 5.804 0 12c.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0C23.512 20.55 23.971 18.196 24 12c-.029-6.185-.484-8.549-4.385-8.816zM9 16V8l8 4-8 4z"/></svg>',
+    play: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><polygon points="8.5 7.5 17.5 12 8.5 16.5 8.5 7.5"/></svg>',
+    twitter: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>',
+    external: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>',
+    details: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>',
+    video: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>',
+    image: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>'
+  };
 
+  const SELECTOR_FOCUSABLE = [
+    'a[href]',
+    'button:not([disabled])',
+    'textarea:not([disabled])',
+    'input:not([disabled])',
+    'select:not([disabled])',
+    '[tabindex]:not([tabindex="-1"])'
+  ].join(',');
+
+  const VIDEO_EXTENSIONS = ['.gif', '.mp4', '.webm', '.mov'];
+  const TRUE_VIDEO_EXTENSIONS = ['.mp4', '.webm', '.mov'];
+
+  function $(selector, root) {
+    return (root || document).querySelector(selector);
+  }
+
+  function $$(selector, root) {
+    return Array.from((root || document).querySelectorAll(selector));
+  }
+
+  function createElement(tagName, options, children) {
+    const element = document.createElement(tagName);
+    const opts = options || {};
+
+    if (opts.className) element.className = opts.className;
+    if (opts.text != null) element.textContent = String(opts.text);
+    if (opts.html != null) element.innerHTML = opts.html;
+
+    if (opts.attrs) {
+      Object.entries(opts.attrs).forEach(([key, value]) => {
+        if (value == null || value === false) return;
+        element.setAttribute(key, value === true ? '' : String(value));
+      });
+    }
+
+    if (opts.dataset) {
+      Object.entries(opts.dataset).forEach(([key, value]) => {
+        if (value != null) element.dataset[key] = String(value);
+      });
+    }
+
+    (children || []).forEach((child) => {
+      if (child == null) return;
+      element.append(child.nodeType ? child : document.createTextNode(String(child)));
+    });
+
+    return element;
+  }
+
+  function appendIcon(parent, iconName) {
+    const icon = createElement('span', {
+      className: 'inline-icon',
+      html: ICONS[iconName] || ICONS.external,
+      attrs: { 'aria-hidden': 'true' }
+    });
+    parent.append(icon);
+  }
+
+  function getSafeHref(url) {
+    if (!url) return '#';
+
+    try {
+      const parsed = new URL(url, window.location.href);
+      const allowed = ['http:', 'https:', 'mailto:'];
+      if (allowed.includes(parsed.protocol)) return url;
+    } catch (error) {
+      return '#';
+    }
+
+    return '#';
+  }
+
+  function isVideoLike(url) {
+    const lower = String(url || '').toLowerCase().split(/[?#]/)[0];
+    return VIDEO_EXTENSIONS.some((extension) => lower.endsWith(extension));
+  }
+
+  function isTrueVideo(url) {
+    const lower = String(url || '').toLowerCase().split(/[?#]/)[0];
+    return TRUE_VIDEO_EXTENSIONS.some((extension) => lower.endsWith(extension));
+  }
+
+  function getDetail(id) {
+    return window.PROJECT_DETAILS && window.PROJECT_DETAILS[id];
+  }
+
+  function getDetailHashId() {
+    const hash = window.location.hash || '';
+    return hash.startsWith('#detail/') ? decodeURIComponent(hash.slice('#detail/'.length)) : '';
+  }
+
+  function getCategoryLabel(category) {
+    return category === 'experience' ? 'Experience' : 'Projects';
+  }
+
+  function getCategoryAnchor(category) {
+    return category === 'experience' ? '#experience' : '#projects';
+  }
+
+  function createTextWithBreaks(text, className) {
+    const fragment = document.createDocumentFragment();
+    const paragraphs = String(text || '').split(/\n{2,}/).filter(Boolean);
+
+    paragraphs.forEach((paragraph, paragraphIndex) => {
+      const p = createElement('p', { className: className || 'detail-desc-text' });
+      paragraph.split('\n').forEach((line, lineIndex) => {
+        if (lineIndex > 0) p.append(createElement('br'));
+        p.append(document.createTextNode(line));
+      });
+      fragment.append(p);
+      if (paragraphIndex < paragraphs.length - 1) {
+        fragment.append(createElement('span', { className: 'text-block-spacer', attrs: { 'aria-hidden': 'true' } }));
+      }
+    });
+
+    return fragment;
+  }
+
+  function getFocusableElements(container) {
+    return $$(SELECTOR_FOCUSABLE, container).filter((element) => {
+      return !element.hasAttribute('disabled') && element.getClientRects().length > 0;
+    });
+  }
+
+  function trapFocus(event, container) {
+    if (event.key !== 'Tab') return;
+
+    const focusable = getFocusableElements(container);
+    if (!focusable.length) {
+      event.preventDefault();
+      container.focus();
+      return;
+    }
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
+
+  function renderCardLinks(links, detail, options) {
+    const container = createElement('div', { className: 'project-links' });
+    const opts = options || {};
+
+    (links || []).forEach((link) => {
+      const anchor = createElement('a', {
+        className: 'project-link',
+        attrs: {
+          href: getSafeHref(link.url),
+          target: '_blank',
+          rel: 'noopener'
+        }
+      });
+      appendIcon(anchor, link.icon || 'external');
+      anchor.append(document.createTextNode(link.label));
+      container.append(anchor);
+    });
+
+    const media = detail && Array.isArray(detail.media) ? detail.media : [];
+    const hasVideos = media.some((item) => isVideoLike(item.url));
+    const hasImages = media.some((item) => !isVideoLike(item.url));
+
+    if (opts.includeMediaTags && hasVideos) {
+      container.append(createDetailButton(detail.id, 'Demos', 'video', 'detail-media-tag'));
+    }
+    if (opts.includeMediaTags && hasImages) {
+      container.append(createDetailButton(detail.id, 'Screenshots', 'image', 'detail-media-tag'));
+    }
+
+    container.append(createDetailButton(detail.id, 'Details', 'details'));
+    return container;
+  }
+
+  function createDetailButton(id, label, iconName, extraClassName) {
+    const detail = getDetail(id);
+    const button = createElement('button', {
+      className: ['project-link', 'detail-open-link', extraClassName].filter(Boolean).join(' '),
+      attrs: {
+        type: 'button',
+        'data-detail-open': id,
+        'aria-label': 'Open details for ' + (detail ? detail.title : id)
+      }
+    });
+    appendIcon(button, iconName || 'details');
+    button.append(document.createTextNode(label));
+    return button;
+  }
+
+  function renderExperienceCard(item) {
+    const detail = getDetail(item.id);
+    const card = createElement('article', {
+      className: 'experience-card clickable-card',
+      attrs: {
+        tabindex: '0',
+        'data-id': item.id,
+        'aria-label': 'Open details for ' + item.role
+      }
+    });
+
+    const header = createElement('div', { className: 'experience-header' });
+    const titleGroup = createElement('div');
+    titleGroup.append(createElement('h3', { className: 'experience-role', text: item.role }));
+
+    if (item.organizationUrl) {
+      titleGroup.append(createElement('a', {
+        className: 'experience-company',
+        text: item.organization,
+        attrs: { href: getSafeHref(item.organizationUrl), target: '_blank', rel: 'noopener' }
+      }));
+    } else {
+      titleGroup.append(createElement('span', { className: 'experience-company', text: item.organization }));
+    }
+
+    header.append(titleGroup, createElement('span', { className: 'experience-duration', text: item.duration }));
+    card.append(header);
+    card.append(createElement('p', { className: 'experience-desc', text: item.summary }));
+    card.append(renderCardLinks(item.links || [], detail, { includeMediaTags: false }));
+
+    return card;
+  }
+
+  function renderProjectCard(item) {
+    const detail = getDetail(item.id);
+    const card = createElement('article', {
+      className: 'project-card clickable-card',
+      attrs: {
+        tabindex: '0',
+        'data-id': item.id,
+        'aria-label': 'Open details for ' + item.title
+      }
+    });
+
+    const header = createElement('div', { className: 'project-header' });
+    const primaryLink = (item.links || []).find((link) => link.icon === 'github') || (item.links || [])[0];
+
+    if (primaryLink) {
+      header.append(createElement('a', {
+        className: 'project-name',
+        text: item.title,
+        attrs: { href: getSafeHref(primaryLink.url), target: '_blank', rel: 'noopener' }
+      }));
+    } else {
+      header.append(createElement('h3', { className: 'project-name', text: item.title }));
+    }
+
+    if (item.badge) {
+      header.append(createElement('span', { className: 'project-badge', text: item.badge }));
+    }
+
+    card.append(header);
+    card.append(createElement('p', { className: 'project-desc', text: item.summary }));
+    card.append(renderCardLinks(item.links || [], detail, { includeMediaTags: true }));
+
+    return card;
+  }
+
+  function renderOtherProject(item) {
+    const anchor = createElement('a', {
+      className: 'other-project-item',
+      attrs: { href: getSafeHref(item.url), target: '_blank', rel: 'noopener' }
+    });
+
+    const textWrap = createElement('div');
+    textWrap.append(createElement('div', { className: 'other-project-name', text: item.title }));
+    textWrap.append(createElement('div', { className: 'other-project-desc', text: item.description }));
+
+    const icon = createElement('span', { className: 'other-project-link' });
+    appendIcon(icon, 'external');
+
+    anchor.append(textWrap, icon);
+    return anchor;
+  }
+
+  function renderDataDrivenContent() {
+    const data = window.PORTFOLIO_DATA;
+    if (!data) return;
+
+    const experienceList = $('#experience-list');
+    const projectGrid = $('#project-grid');
+    const otherProjects = $('#other-projects-list');
+
+    if (experienceList) {
+      experienceList.replaceChildren(...data.experience.map(renderExperienceCard));
+    }
+    if (projectGrid) {
+      projectGrid.replaceChildren(...data.projects.map(renderProjectCard));
+    }
+    if (otherProjects) {
+      otherProjects.replaceChildren(...data.otherProjects.map(renderOtherProject));
+    }
+  }
+
+  function initScrollReveal() {
+    const elements = $$('.reveal');
     if (!elements.length) return;
+
+    if (!('IntersectionObserver' in window)) {
+      elements.forEach((element) => element.classList.add('revealed'));
+      return;
+    }
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('revealed');
-          } else {
-            entry.target.classList.remove('revealed');
-          }
+          entry.target.classList.toggle('revealed', entry.isIntersecting);
         });
       },
-      {
-        threshold: 0.1,
-        rootMargin: '0px 0px -60px 0px',
-      }
+      { threshold: 0.1, rootMargin: '0px 0px -60px 0px' }
     );
 
-    elements.forEach((el, index) => {
-      el.style.transitionDelay = `${index % 3 * 80}ms`;
-      observer.observe(el);
+    elements.forEach((element, index) => {
+      element.style.transitionDelay = (index % 3) * 80 + 'ms';
+      observer.observe(element);
     });
   }
 
-  // Smooth scroll for anchor links
   function initSmoothScroll() {
-    document.querySelectorAll('a[href^="#"]').forEach((link) => {
-      link.addEventListener('click', (e) => {
+    $$('a[href^="#"]').forEach((link) => {
+      link.addEventListener('click', (event) => {
         const targetId = link.getAttribute('href');
-        if (targetId === '#') return;
+        if (!targetId || targetId === '#' || targetId.startsWith('#detail/')) return;
 
         const target = document.querySelector(targetId);
-        if (target) {
-          e.preventDefault();
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+        if (!target) return;
+
+        event.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
     });
   }
 
-  // Nav background on scroll
   function initNavScroll() {
-    const nav = document.querySelector('.nav');
+    const nav = $('.nav');
     if (!nav) return;
 
     let ticking = false;
 
+    function updateNav() {
+      nav.classList.toggle('nav--scrolled', window.scrollY > 80);
+      ticking = false;
+    }
+
+    updateNav();
     window.addEventListener('scroll', () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          if (window.scrollY > 80) {
-            nav.classList.add('nav--scrolled');
-          } else {
-            nav.classList.remove('nav--scrolled');
-          }
-          ticking = false;
-        });
-        ticking = true;
-      }
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(updateNav);
     }, { passive: true });
   }
 
-  // Stagger children animation for cards and list items
+  function revealGroupChildren(group) {
+    const cards = $$('.experience-card, .project-card, .other-project-item', group);
+    cards.forEach((card, index) => {
+      card.style.transitionDelay = index * 90 + 'ms';
+      card.classList.add('revealed');
+    });
+  }
+
   function initStaggerCards() {
-    const groups = document.querySelectorAll('.experience-list, .project-grid, .other-projects');
+    const groups = $$('.experience-list, .project-grid, .other-projects');
+    if (!groups.length) return;
+
+    if (!('IntersectionObserver' in window)) {
+      groups.forEach(revealGroupChildren);
+      return;
+    }
 
     groups.forEach((group) => {
       const observer = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
-            const cards = entry.target.querySelectorAll('.experience-card, .project-card, .other-project-item');
+            const cards = $$('.experience-card, .project-card, .other-project-item', entry.target);
             if (entry.isIntersecting) {
-              cards.forEach((card, i) => {
-                card.style.transitionDelay = `${i * 120}ms`;
+              cards.forEach((card, index) => {
+                card.style.transitionDelay = index * 90 + 'ms';
                 card.classList.add('revealed');
               });
             } else {
@@ -99,18 +418,22 @@
     });
   }
 
-  // Tech stack pill stagger
   function initTechStagger() {
-    const container = document.querySelector('.tech-pills');
+    const container = $('.tech-pills');
     if (!container) return;
+
+    if (!('IntersectionObserver' in window)) {
+      $$('.tech-pill', container).forEach((pill) => pill.classList.add('revealed'));
+      return;
+    }
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          const pills = entry.target.querySelectorAll('.tech-pill');
+          const pills = $$('.tech-pill', entry.target);
           if (entry.isIntersecting) {
-            pills.forEach((pill, i) => {
-              pill.style.transitionDelay = `${i * 60}ms`;
+            pills.forEach((pill, index) => {
+              pill.style.transitionDelay = index * 55 + 'ms';
               pill.classList.add('revealed');
             });
           } else {
@@ -126,458 +449,455 @@
     observer.observe(container);
   }
 
-  // Scroll indicator fade
   function initScrollIndicator() {
-    const indicator = document.querySelector('.scroll-indicator');
+    const indicator = $('.scroll-indicator');
     if (!indicator) return;
 
+    let ticking = false;
+
+    function updateIndicator() {
+      indicator.style.opacity = String(Math.max(0, 1 - window.scrollY / 300));
+      ticking = false;
+    }
+
     window.addEventListener('scroll', () => {
-      const opacity = Math.max(0, 1 - window.scrollY / 300);
-      indicator.style.opacity = opacity;
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(updateIndicator);
     }, { passive: true });
   }
 
-  // Active nav link highlight
   function initActiveNav() {
-    const sections = document.querySelectorAll('section[id], .scroll-section[id]');
-    const navLinks = document.querySelectorAll('.nav-link');
-
+    const sections = $$('section[id], .scroll-section[id]');
+    const navLinks = $$('.nav-link');
     if (!sections.length || !navLinks.length) return;
+
+    if (!('IntersectionObserver' in window)) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            navLinks.forEach((link) => link.classList.remove('nav-link--active'));
-            const activeLink = document.querySelector(`.nav-link[href="#${entry.target.id}"]`);
-            if (activeLink) activeLink.classList.add('nav-link--active');
-          }
-        });
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+        if (!visible) return;
+
+        navLinks.forEach((link) => link.classList.remove('nav-link--active'));
+        const activeLink = $('.nav-link[href="#' + visible.target.id + '"]');
+        if (activeLink) activeLink.classList.add('nav-link--active');
       },
-      { threshold: 0.3, rootMargin: '-80px 0px -50% 0px' }
+      { threshold: [0.15, 0.3, 0.6], rootMargin: '-90px 0px -45% 0px' }
     );
 
     sections.forEach((section) => observer.observe(section));
   }
 
-  // SVG Icon mappings for modal links
-  const LINK_ICONS = {
-    github: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>',
-    demo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>',
-    play: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><polygon points="8.5 7.5 17.5 12 8.5 16.5 8.5 7.5"/></svg>',
-    twitter: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>',
-    external: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>'
-  };
-
-  // Detail Page handler (full-screen view)
   function initDetailPage() {
-    const detailPage = document.getElementById('detail-page');
-    const detailBody = document.getElementById('detail-body');
-    const detailBack = document.getElementById('detail-back');
-    const breadcrumbs = document.getElementById('detail-breadcrumbs');
-    const clickableCards = document.querySelectorAll('.clickable-card');
+    const detailPage = $('#detail-page');
+    const detailBody = $('#detail-body');
+    const detailBack = $('#detail-back');
+    const breadcrumbs = $('#detail-breadcrumbs');
+    const contentWrapper = $('.content-wrapper');
 
-    if (!detailPage || !detailBody || !detailBack) return;
+    if (!detailPage || !detailBody || !detailBack || !breadcrumbs) return;
 
+    let currentDetailId = '';
     let savedScrollY = 0;
     let savedHash = '';
+    let previouslyFocused = null;
 
-    // Determine category from card context
-    function getCategory(id) {
-      const experienceIds = ['ourora', 'khwaaish', 'sociante'];
-      return experienceIds.includes(id) ? 'Experience' : 'Projects';
+    function renderBreadcrumbs(detail) {
+      const categoryLabel = getCategoryLabel(detail.category);
+      const categoryAnchor = getCategoryAnchor(detail.category);
+
+      const home = createElement('a', { text: 'Portfolio', attrs: { href: '#' } });
+      const category = createElement('a', { text: categoryLabel, attrs: { href: categoryAnchor } });
+      const current = createElement('span', { className: 'breadcrumb-current', text: detail.title });
+
+      const homeWrapper = createElement('span', { className: 'breadcrumb-item' }, [home]);
+      const categoryWrapper = createElement('span', { className: 'breadcrumb-item' }, [category]);
+      const separatorA = createElement('span', { className: 'breadcrumb-separator', text: '\u203a', attrs: { 'aria-hidden': 'true' } });
+      const separatorB = createElement('span', { className: 'breadcrumb-separator', text: '\u203a', attrs: { 'aria-hidden': 'true' } });
+
+      breadcrumbs.replaceChildren(homeWrapper, separatorA, categoryWrapper, separatorB, current);
+
+      home.addEventListener('click', (event) => {
+        event.preventDefault();
+        closeDetail({ restoreUrl: true, restoreFocus: true });
+      });
+
+      category.addEventListener('click', (event) => {
+        event.preventDefault();
+        closeDetail({ restoreUrl: true, restoreFocus: false });
+        window.setTimeout(() => {
+          const target = document.querySelector(categoryAnchor);
+          if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 80);
+      });
     }
 
-    function getCategoryAnchor(category) {
-      return category === 'Experience' ? '#experience' : '#projects';
-    }
+    function renderDetailSection(section) {
+      const wrapper = createElement('section', { className: 'detail-body-section' });
+      wrapper.append(createElement('h2', { className: 'detail-section-title', text: section.title }));
 
-    function buildBreadcrumbs(category, title) {
-      breadcrumbs.innerHTML = `
-        <span class="breadcrumb-item"><a href="#" id="bc-home">Portfolio</a></span>
-        <span class="breadcrumb-separator">›</span>
-        <span class="breadcrumb-item"><a href="${getCategoryAnchor(category)}" id="bc-category">${category}</a></span>
-        <span class="breadcrumb-separator">›</span>
-        <span class="breadcrumb-current">${title}</span>
-      `;
-
-      // Clicking breadcrumb links closes the detail page
-      const bcHome = document.getElementById('bc-home');
-      const bcCategory = document.getElementById('bc-category');
-
-      if (bcHome) {
-        bcHome.addEventListener('click', (e) => {
-          e.preventDefault();
-          closeDetail();
-        });
+      if (Array.isArray(section.items) && section.items.length) {
+        const list = createElement('ul', { className: 'detail-features' });
+        section.items.forEach((item) => list.append(createElement('li', { text: item })));
+        wrapper.append(list);
       }
-      if (bcCategory) {
-        bcCategory.addEventListener('click', (e) => {
-          e.preventDefault();
-          closeDetail();
-          setTimeout(() => {
-            const target = document.querySelector(getCategoryAnchor(category));
-            if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }, 480);
-        });
+
+      if (section.body) {
+        wrapper.append(createTextWithBreaks(section.body, 'detail-desc-text'));
       }
+
+      return wrapper;
     }
 
-    function openDetail(id) {
-      const data = window.PROJECT_DETAILS[id];
-      if (!data) return;
-
-      const category = getCategory(id);
-      buildBreadcrumbs(category, data.title);
-
-      // Build content sections
-      const reasonHTML = data.reason
-        ? `<div class="detail-body-section">
-             <h3 class="detail-section-title">Core Problem</h3>
-             <p class="detail-desc-text">${data.reason.replace(/\\n/g, '<br>')}</p>
-           </div>`
-        : '';
-
-      const architectureHTML = data.architecture
-        ? `<div class="detail-body-section">
-             <h3 class="detail-section-title">System Architecture</h3>
-             <p class="detail-desc-text">${data.architecture.replace(/\\n/g, '<br>')}</p>
-           </div>`
-        : '';
-
-      const techHTML = data.tech
-        ? `<div class="detail-body-section">
-             <h3 class="detail-section-title">Technical Implementation & Stack</h3>
-             <p class="detail-desc-text">${data.tech.replace(/\\n/g, '<br>')}</p>
-           </div>`
-        : '';
-
-      const featuresHTML = data.features && data.features.length
-        ? `<div class="detail-body-section">
-             <h3 class="detail-section-title">Core Focus & Features</h3>
-             <ul class="detail-features">
-               ${data.features.map(f => `<li>${f}</li>`).join('')}
-             </ul>
-           </div>`
-        : '';
-
-      // Separate images into videos (GIFs/video files) and static images
-      let videosHTML = '';
-      let imagesHTML = '';
-
-      if (data.images && data.images.length) {
-        const videoExts = ['.gif', '.mp4', '.webm', '.mov'];
-        const videos = data.images.filter(img => videoExts.some(ext => img.url.toLowerCase().endsWith(ext)));
-        const statics = data.images.filter(img => !videoExts.some(ext => img.url.toLowerCase().endsWith(ext)));
-
-        if (videos.length) {
-          videosHTML = `<div class="detail-body-section detail-media-section">
-               <h3 class="detail-section-title">Video Demos</h3>
-               <div class="detail-gallery detail-gallery-scroll">
-                 ${videos.map(img => {
-                   const isVideo = img.url.toLowerCase().endsWith('.mp4') || img.url.toLowerCase().endsWith('.webm') || img.url.toLowerCase().endsWith('.mov');
-                   const mediaEl = isVideo
-                     ? `<video src="${img.url}" autoplay loop muted playsinline></video>`
-                     : `<img src="${img.url}" alt="${img.caption || 'Demo'}" loading="lazy">`;
-                   return `<div class="detail-gallery-item">${mediaEl}<span class="detail-gallery-caption">${img.caption}</span></div>`;
-                 }).join('')}
-               </div>
-             </div>`;
+    function renderMediaItem(item, globalIndex) {
+      const url = item.url || '';
+      const caption = item.caption || 'Project media';
+      const trueVideo = isTrueVideo(url);
+      const button = createElement('button', {
+        className: 'detail-gallery-item',
+        attrs: {
+          type: 'button',
+          'data-media-index': globalIndex,
+          'data-src': url,
+          'data-kind': trueVideo ? 'video' : 'image',
+          'data-caption': caption,
+          'aria-label': 'Open media preview: ' + caption
         }
+      });
 
-        if (statics.length) {
-          imagesHTML = `<div class="detail-body-section detail-media-section">
-               <h3 class="detail-section-title">Screenshots & Assets</h3>
-               <div class="detail-gallery detail-gallery-scroll">
-                 ${statics.map(img => `
-                   <div class="detail-gallery-item">
-                     <img src="${img.url}" alt="${img.caption || 'Project asset'}" loading="lazy">
-                     <span class="detail-gallery-caption">${img.caption}</span>
-                   </div>
-                 `).join('')}
-               </div>
-             </div>`;
-        }
+      if (trueVideo) {
+        const video = createElement('video', {
+          attrs: {
+            src: url,
+            autoplay: true,
+            loop: true,
+            muted: true,
+            playsinline: true,
+            preload: 'metadata'
+          }
+        });
+        video.muted = true;
+        button.append(video);
+      } else {
+        button.append(createElement('img', {
+          attrs: {
+            src: url,
+            alt: caption,
+            loading: 'lazy',
+            decoding: 'async'
+          }
+        }));
       }
 
-      const linksHTML = data.links && data.links.length
-        ? `<div class="detail-body-section">
-             <h3 class="detail-section-title">Links</h3>
-             <div class="detail-links">
-               ${data.links.map(link => `
-                 <a href="${link.url}" target="_blank" rel="noopener" class="detail-btn">
-                   ${LINK_ICONS[link.icon] || LINK_ICONS.external}
-                   ${link.label}
-                 </a>
-               `).join('')}
-             </div>
-           </div>`
-        : '';
+      button.append(createElement('span', { className: 'detail-gallery-caption', text: caption }));
+      return button;
+    }
 
-      detailBody.innerHTML = `
-        <div class="detail-content-inner">
-          <div class="detail-hero">
-            <div class="detail-meta">
-              <span class="detail-duration">${data.duration}</span>
-            </div>
-            <h1 class="detail-title">${data.title}</h1>
-            ${data.subtitle ? `<span class="detail-company">${data.subtitle}</span>` : ''}
-            <div class="detail-tags">
-              ${data.tags.map(tag => `<span class="detail-tag">${tag}</span>`).join('')}
-            </div>
-          </div>
+    function renderMediaSection(title, items, offset) {
+      const wrapper = createElement('section', { className: 'detail-body-section detail-media-section' });
+      wrapper.append(createElement('h2', { className: 'detail-section-title', text: title }));
 
-          ${videosHTML}
-          ${imagesHTML}
+      const scroller = createElement('div', { className: 'detail-gallery detail-gallery-scroll' });
+      items.forEach((item, index) => scroller.append(renderMediaItem(item, offset + index)));
+      wrapper.append(scroller);
+      return wrapper;
+    }
 
-          <div class="detail-body-section">
-            <p class="detail-desc-text">${data.description}</p>
-          </div>
+    function renderDetailLinks(links) {
+      const wrapper = createElement('section', { className: 'detail-body-section' });
+      wrapper.append(createElement('h2', { className: 'detail-section-title', text: 'Links' }));
 
-          <div class="detail-body-section">
-            <h3 class="detail-section-title">Why I Built This</h3>
-            <p class="detail-desc-text">${data.why}</p>
-          </div>
+      const linkWrap = createElement('div', { className: 'detail-links' });
+      links.forEach((link) => {
+        const anchor = createElement('a', {
+          className: 'detail-btn',
+          attrs: {
+            href: getSafeHref(link.url),
+            target: '_blank',
+            rel: 'noopener'
+          }
+        });
+        appendIcon(anchor, link.icon || 'external');
+        anchor.append(document.createTextNode(link.label));
+        linkWrap.append(anchor);
+      });
+      wrapper.append(linkWrap);
+      return wrapper;
+    }
 
-          ${reasonHTML}
-          ${architectureHTML}
-          ${techHTML}
-          ${featuresHTML}
-          ${linksHTML}
-        </div>
-      `;
+    function renderDetailContent(detail) {
+      const content = createElement('div', { className: 'detail-content-inner' });
 
-      // Save scroll position, lock body, show detail page
-      savedScrollY = window.scrollY;
-      savedHash = window.location.hash;
-      document.body.classList.add('detail-open');
-      detailPage.classList.add('detail--active');
+      const hero = createElement('header', { className: 'detail-hero' });
+      const meta = createElement('div', { className: 'detail-meta' });
+      if (detail.duration) meta.append(createElement('span', { className: 'detail-duration', text: detail.duration }));
+      hero.append(meta);
+      hero.append(createElement('h1', { className: 'detail-title', text: detail.title, attrs: { id: 'detail-title' } }));
+      if (detail.subtitle) hero.append(createElement('span', { className: 'detail-company', text: detail.subtitle }));
+
+      if (Array.isArray(detail.tags) && detail.tags.length) {
+        const tags = createElement('div', { className: 'detail-tags' });
+        detail.tags.forEach((tag) => tags.append(createElement('span', { className: 'detail-tag', text: tag })));
+        hero.append(tags);
+      }
+      content.append(hero);
+
+      const media = Array.isArray(detail.media) ? detail.media : [];
+      const demos = media.filter((item) => isVideoLike(item.url));
+      const screenshots = media.filter((item) => !isVideoLike(item.url));
+
+      if (demos.length) content.append(renderMediaSection('Video Demos', demos, 0));
+      if (screenshots.length) content.append(renderMediaSection('Screenshots and Assets', screenshots, demos.length));
+
+      if (detail.description) {
+        const summary = createElement('section', { className: 'detail-body-section' });
+        summary.append(createTextWithBreaks(detail.description, 'detail-desc-text'));
+        content.append(summary);
+      }
+
+      (detail.sections || []).forEach((section) => content.append(renderDetailSection(section)));
+
+      if (Array.isArray(detail.links) && detail.links.length) {
+        content.append(renderDetailLinks(detail.links));
+      }
+
+      return content;
+    }
+
+    function openDetail(id, options) {
+      const detail = getDetail(id);
+      if (!detail) return;
+
+      const opts = Object.assign({ pushHistory: true }, options || {});
+      const wasOpen = Boolean(currentDetailId);
+
+      if (!wasOpen) {
+        savedScrollY = window.scrollY;
+        savedHash = window.location.hash && !window.location.hash.startsWith('#detail/') ? window.location.hash : '';
+        previouslyFocused = document.activeElement;
+      }
+
+      currentDetailId = id;
+      renderBreadcrumbs(detail);
+      detailBody.replaceChildren(renderDetailContent(detail));
       detailBody.scrollTop = 0;
 
-      // Push state for browser back support
-      history.pushState({ detailId: id }, '', `#detail/${id}`);
-    }
+      document.body.classList.add('detail-open');
+      detailPage.classList.add('detail--active');
+      detailPage.setAttribute('aria-hidden', 'false');
+      if (contentWrapper) contentWrapper.setAttribute('inert', '');
 
-    function closeDetail() {
-      if (!detailPage.classList.contains('detail--active')) return;
-
-      detailPage.classList.remove('detail--active');
-      document.body.classList.remove('detail-open');
-
-      // Clean the URL hash without triggering navigation
-      if (window.location.hash.startsWith('#detail/')) {
-        history.replaceState(null, '', savedHash || window.location.pathname);
+      if (opts.pushHistory) {
+        history.pushState({ detailId: id }, '', '#detail/' + encodeURIComponent(id));
       }
 
-      // Restore scroll position after transition
-      setTimeout(() => {
-        window.scrollTo(0, savedScrollY);
-      }, 50);
-    }
-
-    // Inject media indicator tags on cards that have assets
-    clickableCards.forEach(card => {
-      const id = card.getAttribute('data-id');
-      const data = window.PROJECT_DETAILS[id];
-      if (!data || !data.images || !data.images.length) return;
-
-      const videoExts = ['.gif', '.mp4', '.webm', '.mov'];
-      const hasVideos = data.images.some(img => videoExts.some(ext => img.url.toLowerCase().endsWith(ext)));
-      const hasStatics = data.images.some(img => !videoExts.some(ext => img.url.toLowerCase().endsWith(ext)));
-
-      // Find or create the links container
-      let linksContainer = card.querySelector('.project-links');
-      if (!linksContainer) {
-        linksContainer = document.createElement('div');
-        linksContainer.className = 'project-links';
-        card.appendChild(linksContainer);
-      }
-
-      if (hasVideos) {
-        const tag = document.createElement('span');
-        tag.className = 'project-link detail-media-tag';
-        tag.setAttribute('data-detail-trigger', id);
-        tag.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> Demos`;
-        linksContainer.appendChild(tag);
-      }
-
-      if (hasStatics) {
-        const tag = document.createElement('span');
-        tag.className = 'project-link detail-media-tag';
-        tag.setAttribute('data-detail-trigger', id);
-        tag.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Screenshots`;
-        linksContainer.appendChild(tag);
-      }
-    });
-
-    // Attach click events to cards
-    clickableCards.forEach(card => {
-      card.addEventListener('click', (e) => {
-        // Allow detail-media-tag clicks to open detail
-        const mediaTrigger = e.target.closest('.detail-media-tag');
-        if (mediaTrigger) {
-          e.stopPropagation();
-          const triggerId = mediaTrigger.getAttribute('data-detail-trigger');
-          openDetail(triggerId);
-          return;
-        }
-        // Prevent click if we clicked a nested external link
-        if (e.target.closest('.project-link') || e.target.closest('.project-links a') || e.target.closest('a')) {
-          return;
-        }
-        const id = card.getAttribute('data-id');
-        openDetail(id);
+      requestAnimationFrame(() => {
+        detailBack.focus({ preventScroll: true });
       });
+    }
+
+    function closeDetail(options) {
+      if (!currentDetailId) return;
+
+      const opts = Object.assign({ restoreUrl: true, restoreFocus: true }, options || {});
+      const focusTarget = previouslyFocused;
+
+      currentDetailId = '';
+      detailPage.classList.remove('detail--active');
+      detailPage.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('detail-open');
+      if (contentWrapper) contentWrapper.removeAttribute('inert');
+
+      if (opts.restoreUrl && window.location.hash.startsWith('#detail/')) {
+        const cleanUrl = window.location.pathname + window.location.search + (savedHash || '');
+        history.replaceState(null, '', cleanUrl);
+      }
+
+      requestAnimationFrame(() => {
+        window.scrollTo(0, savedScrollY);
+        if (opts.restoreFocus && focusTarget && typeof focusTarget.focus === 'function') {
+          focusTarget.focus({ preventScroll: true });
+        }
+      });
+    }
+
+    function isInteractiveClick(event) {
+      return Boolean(event.target.closest('a, button'));
+    }
+
+    document.addEventListener('click', (event) => {
+      const trigger = event.target.closest('[data-detail-open]');
+      if (trigger) {
+        event.preventDefault();
+        event.stopPropagation();
+        openDetail(trigger.getAttribute('data-detail-open'));
+        return;
+      }
+
+      const card = event.target.closest('.clickable-card');
+      if (!card || isInteractiveClick(event)) return;
+
+      openDetail(card.getAttribute('data-id'));
     });
 
-    // Back button
-    detailBack.addEventListener('click', () => {
-      closeDetail();
+    document.addEventListener('keydown', (event) => {
+      const card = event.target.closest('.clickable-card');
+      if (!card || event.target !== card) return;
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+
+      event.preventDefault();
+      openDetail(card.getAttribute('data-id'));
     });
 
-    // Escape key
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && detailPage.classList.contains('detail--active')) {
-        closeDetail();
+    detailBack.addEventListener('click', () => closeDetail({ restoreUrl: true, restoreFocus: true }));
+
+    window.addEventListener('keydown', (event) => {
+      if (!currentDetailId || $('.media-lightbox.lightbox--active')) return;
+
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeDetail({ restoreUrl: true, restoreFocus: true });
+      } else {
+        trapFocus(event, detailPage);
       }
     });
 
-    // Browser back/forward support
-    window.addEventListener('popstate', (e) => {
-      if (e.state && e.state.detailId) {
-        openDetail(e.state.detailId);
-      } else if (detailPage.classList.contains('detail--active')) {
-        // Browser back was pressed — close without pushing more history
-        detailPage.classList.remove('detail--active');
-        document.body.classList.remove('detail-open');
-        setTimeout(() => {
-          window.scrollTo(0, savedScrollY);
-        }, 50);
+    window.addEventListener('popstate', () => {
+      const id = getDetailHashId();
+      if (id && getDetail(id)) {
+        openDetail(id, { pushHistory: false });
+      } else if (currentDetailId) {
+        closeDetail({ restoreUrl: false, restoreFocus: true });
       }
     });
 
-    // Handle direct URL with detail hash on load
-    if (window.location.hash.startsWith('#detail/')) {
-      const id = window.location.hash.replace('#detail/', '');
-      if (window.PROJECT_DETAILS[id]) {
-        setTimeout(() => openDetail(id), 300);
-      }
+    const initialId = getDetailHashId();
+    if (initialId && getDetail(initialId)) {
+      openDetail(initialId, { pushHistory: false });
     }
   }
 
-  // Media Lightbox
   function initLightbox() {
-    const lightbox = document.getElementById('media-lightbox');
-    const lightboxMedia = document.getElementById('lightbox-media');
-    const lightboxCaption = document.getElementById('lightbox-caption');
-    const lightboxCounter = document.getElementById('lightbox-counter');
-    const lightboxClose = document.getElementById('lightbox-close');
-    const lightboxPrev = document.getElementById('lightbox-prev');
-    const lightboxNext = document.getElementById('lightbox-next');
-    const detailBody = document.getElementById('detail-body');
+    const lightbox = $('#media-lightbox');
+    const lightboxMedia = $('#lightbox-media');
+    const lightboxCaption = $('#lightbox-caption');
+    const lightboxCounter = $('#lightbox-counter');
+    const lightboxClose = $('#lightbox-close');
+    const lightboxPrev = $('#lightbox-prev');
+    const lightboxNext = $('#lightbox-next');
+    const detailBody = $('#detail-body');
 
-    if (!lightbox || !detailBody) return;
+    if (!lightbox || !lightboxMedia || !lightboxCaption || !lightboxCounter || !detailBody) return;
 
     let currentItems = [];
     let currentIndex = 0;
+    let previouslyFocused = null;
 
     function getMediaItems() {
-      const items = [];
-      const galleryItems = detailBody.querySelectorAll('.detail-gallery-item');
-      galleryItems.forEach(item => {
-        const media = item.querySelector('img, video');
-        const caption = item.querySelector('.detail-gallery-caption');
-        if (media) {
-          items.push({
-            src: media.src || media.querySelector('source')?.src,
-            isVideo: media.tagName === 'VIDEO',
-            isGif: media.src && media.src.toLowerCase().endsWith('.gif'),
-            caption: caption ? caption.textContent : ''
-          });
-        }
-      });
-      return items;
+      return $$('.detail-gallery-item', detailBody).map((item) => ({
+        src: item.getAttribute('data-src'),
+        kind: item.getAttribute('data-kind'),
+        caption: item.getAttribute('data-caption') || ''
+      }));
     }
 
-    function showItem(index) {
+    function renderLightboxItem() {
       if (!currentItems.length) return;
-      currentIndex = index;
+
       const item = currentItems[currentIndex];
+      const isVideo = item.kind === 'video';
+      const media = isVideo
+        ? createElement('video', { attrs: { src: item.src, autoplay: true, loop: true, muted: true, playsinline: true, controls: true } })
+        : createElement('img', { attrs: { src: item.src, alt: item.caption || 'Project media' } });
 
-      let mediaEl;
-      if (item.isVideo) {
-        mediaEl = `<video src="${item.src}" autoplay loop muted playsinline controls></video>`;
-      } else {
-        mediaEl = `<img src="${item.src}" alt="${item.caption}">`;
-      }
+      if (isVideo) media.muted = true;
 
-      lightboxMedia.innerHTML = mediaEl;
+      lightboxMedia.replaceChildren(media);
       lightboxCaption.textContent = item.caption;
-      lightboxCounter.textContent = `${currentIndex + 1} / ${currentItems.length}`;
-
-      // Hide nav if only one item
-      lightboxPrev.style.display = currentItems.length > 1 ? 'flex' : 'none';
-      lightboxNext.style.display = currentItems.length > 1 ? 'flex' : 'none';
+      lightboxCounter.textContent = currentIndex + 1 + ' / ' + currentItems.length;
+      lightboxPrev.hidden = currentItems.length <= 1;
+      lightboxNext.hidden = currentItems.length <= 1;
     }
 
     function openLightbox(index) {
       currentItems = getMediaItems();
       if (!currentItems.length) return;
-      showItem(index);
+
+      currentIndex = Math.max(0, Math.min(index, currentItems.length - 1));
+      previouslyFocused = document.activeElement;
+      renderLightboxItem();
+
+      document.body.classList.add('lightbox-open');
       lightbox.classList.add('lightbox--active');
+      lightbox.setAttribute('aria-hidden', 'false');
+      requestAnimationFrame(() => lightboxClose.focus({ preventScroll: true }));
     }
 
     function closeLightbox() {
+      if (!lightbox.classList.contains('lightbox--active')) return;
+
       lightbox.classList.remove('lightbox--active');
-      lightboxMedia.innerHTML = '';
+      lightbox.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('lightbox-open');
+      lightboxMedia.replaceChildren();
+
+      if (previouslyFocused && typeof previouslyFocused.focus === 'function') {
+        previouslyFocused.focus({ preventScroll: true });
+      }
     }
 
     function nextItem() {
       if (currentItems.length <= 1) return;
-      showItem((currentIndex + 1) % currentItems.length);
+      currentIndex = (currentIndex + 1) % currentItems.length;
+      renderLightboxItem();
     }
 
-    function prevItem() {
+    function previousItem() {
       if (currentItems.length <= 1) return;
-      showItem((currentIndex - 1 + currentItems.length) % currentItems.length);
+      currentIndex = (currentIndex - 1 + currentItems.length) % currentItems.length;
+      renderLightboxItem();
     }
 
-    // Event delegation — click on gallery items inside detail body
-    detailBody.addEventListener('click', (e) => {
-      const galleryItem = e.target.closest('.detail-gallery-item');
-      if (!galleryItem) return;
+    detailBody.addEventListener('click', (event) => {
+      const item = event.target.closest('.detail-gallery-item');
+      if (!item) return;
 
-      // Find the index of this item among all gallery items
-      const allItems = detailBody.querySelectorAll('.detail-gallery-item');
-      let idx = 0;
-      allItems.forEach((item, i) => {
-        if (item === galleryItem) idx = i;
-      });
-
-      openLightbox(idx);
+      event.preventDefault();
+      openLightbox(Number(item.getAttribute('data-media-index')) || 0);
     });
 
     lightboxClose.addEventListener('click', closeLightbox);
-    lightboxPrev.addEventListener('click', prevItem);
+    lightboxPrev.addEventListener('click', previousItem);
     lightboxNext.addEventListener('click', nextItem);
 
-    // Click on backdrop to close
-    lightbox.addEventListener('click', (e) => {
-      if (e.target === lightbox) closeLightbox();
+    lightbox.addEventListener('click', (event) => {
+      if (event.target === lightbox) closeLightbox();
     });
 
-    // Keyboard navigation
-    window.addEventListener('keydown', (e) => {
+    window.addEventListener('keydown', (event) => {
       if (!lightbox.classList.contains('lightbox--active')) return;
 
-      if (e.key === 'Escape') closeLightbox();
-      else if (e.key === 'ArrowRight') nextItem();
-      else if (e.key === 'ArrowLeft') prevItem();
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeLightbox();
+      } else if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        nextItem();
+      } else if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        previousItem();
+      } else {
+        trapFocus(event, lightbox);
+      }
     });
   }
 
-  // Initialize everything
   function init() {
+    renderDataDrivenContent();
     initScrollReveal();
     initSmoothScroll();
     initNavScroll();
@@ -590,9 +910,8 @@
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', init, { once: true });
   } else {
     init();
   }
 })();
-

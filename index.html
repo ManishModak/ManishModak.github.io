@@ -24,12 +24,12 @@
 <body>
 
   <!-- Flow Field Background -->
-  <canvas id="flowfield-canvas"></canvas>
+  <canvas id="flowfield-canvas" aria-hidden="true"></canvas>
 
   <div class="content-wrapper">
 
     <!-- Navigation -->
-    <nav class="nav" id="nav">
+    <nav class="nav" id="nav" aria-label="Primary navigation">
       <a href="#" class="nav-logo">mm.</a>
       <ul class="nav-links">
         <li><a href="#about" class="nav-link">About</a></li>
@@ -171,123 +171,14 @@
         <div id="experience" class="work-col scroll-section">
           <span class="section-label reveal">04 / Experience</span>
           <h2 class="section-title reveal">Professional Experience</h2>
-          <div class="experience-list">
-
-            <div class="experience-card clickable-card" data-id="ourora">
-              <div class="experience-header">
-                <div>
-                  <h3 class="experience-role">Founding Engineer</h3>
-                  <a href="https://ourora.in" target="_blank" rel="noopener" class="experience-company">Ourora</a>
-                </div>
-                <span class="experience-duration">Feb 2026 – Present</span>
-              </div>
-              <p class="experience-desc">Leading Flutter development for Android & iOS at a privacy-first couples app, in close collaboration with the founder. Owning architecture decisions for encrypted chat, voice/video, and shared media vault systems.</p>
-              <div class="project-links">
-                <a href="https://play.google.com/store/apps/details?id=com.ourora.connect&hl=en_IN" target="_blank" rel="noopener" class="project-link">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><polygon points="8.5 7.5 17.5 12 8.5 16.5 8.5 7.5"/></svg>
-                  Google Play
-                </a>
-                <a href="https://x.com/0p3nsky_/status/2055249561841795282" target="_blank" rel="noopener" class="project-link">
-                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                  Launch X Post
-                </a>
-              </div>
-            </div>
-
-            <div class="experience-card clickable-card" data-id="khwaaish">
-              <div class="experience-header">
-                <div>
-                  <h3 class="experience-role">Lead Flutter Developer</h3>
-                  <span class="experience-company">Khwaaish AI / Eastri</span>
-                </div>
-                <span class="experience-duration">Oct 2025 – Present</span>
-              </div>
-              <p class="experience-desc"><strong>Khwaaish AI:</strong> Building personal AI agent app that orders, books, and buys autonomously. Architecting multi-service integration and system design. <br><strong>Eastri:</strong> Implementing optimizations on laundry services app connecting local shops with customers.</p>
-            </div>
-
-            <div class="experience-card clickable-card" data-id="sociante">
-              <div class="experience-header">
-                <div>
-                  <h3 class="experience-role">SDE (Flutter) Intern</h3>
-                  <a href="https://drive.google.com/file/d/1NO2Im8o_qOnMwfTwqbFCPNMqVFYMAkYi/view?usp=sharing" target="_blank" rel="noopener" class="experience-company">Sociante Pvt Ltd</a>
-                </div>
-                <span class="experience-duration">Oct 2024 – Apr 2025</span>
-              </div>
-              <p class="experience-desc">Enhanced user engagement and operational efficiency via Automated Parking Management System. Crafted responsive UI/UX (40+ screens) and integrated Razorpay, ANPR, and Google Maps API.</p>
-            </div>
-
-          </div>
+          <div class="experience-list" id="experience-list" aria-live="polite"></div>
         </div>
 
         <!-- Right Column: Projects -->
         <div id="projects" class="work-col scroll-section">
           <span class="section-label reveal">05 / Work</span>
           <h2 class="section-title reveal">Featured Projects</h2>
-          <div class="project-grid">
-
-            <div class="project-card clickable-card" data-id="parallax-connect">
-              <div class="project-header">
-                <a href="https://github.com/ManishModak/parallax-connect-mobile" target="_blank" rel="noopener" class="project-name">Parallax Connect</a>
-                <span class="project-badge">Hackathon Winner</span>
-              </div>
-              <p class="project-desc">Winner at Gradient Network Hackathon 2026. Mobile app for local AI with chat, vision/OCR, and web search capabilities.</p>
-              <div class="project-links">
-                <a href="https://github.com/ManishModak/parallax-connect-mobile" target="_blank" rel="noopener" class="project-link">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-                  Source
-                </a>
-                <a href="https://youtu.be/1G5gAEA_tz8" target="_blank" rel="noopener" class="project-link">
-                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0C.488 3.45.029 5.804 0 12c.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0C23.512 20.55 23.971 18.196 24 12c-.029-6.185-.484-8.549-4.385-8.816zM9 16V8l8 4-8 4z"/></svg>
-                  YT Demo
-                </a>
-              </div>
-            </div>
-
-            <div class="project-card clickable-card" data-id="necro-pet">
-              <div class="project-header">
-                <a href="https://github.com/ManishModak/necro-pet" target="_blank" rel="noopener" class="project-name">Necro-Pet</a>
-              </div>
-              <p class="project-desc">Desktop virtual pet that gamifies coding. Build streaks, level up your pet, and make development sessions more engaging.</p>
-              <div class="project-links">
-                <a href="https://github.com/ManishModak/necro-pet" target="_blank" rel="noopener" class="project-link">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-                  Source
-                </a>
-                <a href="https://youtu.be/VSRB3CIGBws" target="_blank" rel="noopener" class="project-link">
-                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0C.488 3.45.029 5.804 0 12c.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0C23.512 20.55 23.971 18.196 24 12c-.029-6.185-.484-8.549-4.385-8.816zM9 16V8l8 4-8 4z"/></svg>
-                  YT Demo
-                </a>
-              </div>
-            </div>
-
-            <div class="project-card clickable-card" data-id="data-hive">
-              <div class="project-header">
-                <a href="https://github.com/ManishModak/data_hive" target="_blank" rel="noopener" class="project-name">Data Hive</a>
-              </div>
-              <p class="project-desc">Reverse-engineered a browser extension and reimplemented it to run on Docker. Self-hosted data collection without the browser dependency.</p>
-              <div class="project-links">
-                <a href="https://github.com/ManishModak/data_hive" target="_blank" rel="noopener" class="project-link">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-                  Source
-                </a>
-              </div>
-            </div>
-
-            <div class="project-card clickable-card" data-id="specgen-chatbot">
-              <div class="project-header">
-                <a href="https://github.com/ManishModak/specgen-chatbot" target="_blank" rel="noopener" class="project-name">SpecGen Chatbot</a>
-                <span class="project-badge">In Progress</span>
-              </div>
-              <p class="project-desc">AI-powered product spec generator with a Crawl4AI scraper. Feed it a product page, get a structured specification document.</p>
-              <div class="project-links">
-                <a href="https://github.com/ManishModak/specgen-chatbot" target="_blank" rel="noopener" class="project-link">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-                  Source
-                </a>
-              </div>
-            </div>
-
-          </div>
+          <div class="project-grid" id="project-grid" aria-live="polite"></div>
         </div>
 
       </div>
@@ -298,39 +189,7 @@
       <div class="section-inner">
         <span class="section-label reveal">06 / More</span>
         <h2 class="section-title reveal">Other Projects</h2>
-        <div class="other-projects">
-
-          <a href="https://github.com/ManishModak/Smart-India-Hackathon-2023" target="_blank" rel="noopener" class="other-project-item">
-            <div>
-              <div class="other-project-name">Smart India Hackathon 2023</div>
-              <div class="other-project-desc">Disaster management app with Flutter & Firebase</div>
-            </div>
-            <span class="other-project-link">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
-            </span>
-          </a>
-
-          <a href="https://github.com/ManishModak/flutter_driver_app" target="_blank" rel="noopener" class="other-project-item">
-            <div>
-              <div class="other-project-name">Flutter Driver App</div>
-              <div class="other-project-desc">Driver app implementation</div>
-            </div>
-            <span class="other-project-link">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
-            </span>
-          </a>
-
-          <a href="https://github.com/ManishModak/synq-web-portal" target="_blank" rel="noopener" class="other-project-item">
-            <div>
-              <div class="other-project-name">Synq Web Portal</div>
-              <div class="other-project-desc">Web portal project</div>
-            </div>
-            <span class="other-project-link">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
-            </span>
-          </a>
-
-        </div>
+        <div class="other-projects" id="other-projects-list" aria-live="polite"></div>
       </div>
     </section>
 
@@ -343,7 +202,7 @@
   </div>
 
   <!-- Full-Screen Project Detail Page -->
-  <div id="detail-page" class="detail-page">
+  <div id="detail-page" class="detail-page" role="dialog" aria-modal="true" aria-labelledby="detail-title" aria-hidden="true" tabindex="-1">
     <div class="detail-page-inner">
       <!-- Top bar with breadcrumbs and back -->
       <header class="detail-topbar" id="detail-topbar">
@@ -363,7 +222,7 @@
   </div>
 
   <!-- Media Lightbox -->
-  <div id="media-lightbox" class="media-lightbox">
+  <div id="media-lightbox" class="media-lightbox" role="dialog" aria-modal="true" aria-label="Media preview" aria-hidden="true" tabindex="-1">
     <button class="lightbox-close" id="lightbox-close" aria-label="Close preview">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
