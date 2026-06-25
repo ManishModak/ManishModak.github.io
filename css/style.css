@@ -278,6 +278,32 @@ section {
   flex-shrink: 0;
 }
 
+.hero-building {
+  margin-top: 32px;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.hero-building-link {
+  color: var(--text-secondary);
+  border-bottom: 1px dashed var(--border-hover);
+  transition: all var(--transition-base);
+}
+
+.hero-building-link:hover {
+  color: var(--text-accent);
+  border-bottom-color: var(--text-accent);
+}
+
+.hero-building-separator {
+  color: var(--text-muted);
+}
+
 /* Scroll indicator */
 .scroll-indicator {
   position: absolute;

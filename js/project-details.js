@@ -18,7 +18,8 @@
         summary: 'Leading Flutter development for Android and iOS at a privacy-first couples app. Owning architecture decisions for encrypted chat, voice/video, and shared media vault systems.',
         tags: ['Flutter', 'Dart', 'WebRTC', 'Encryption', 'Firebase'],
         links: [
-          { label: 'Google Play', url: 'https://play.google.com/store/apps/details?id=com.ourora.connect&hl=en_IN', icon: 'play' },
+          { label: 'App Store', url: 'https://apps.apple.com/us/app/ourora-connect/id6759134873', icon: 'apple' },
+          { label: 'Google Play', url: 'https://play.google.com/store/apps/details?id=com.ourora.connect', icon: 'play' },
           { label: 'Launch X Post', url: 'https://x.com/0p3nsky_/status/2055249561841795282', icon: 'twitter' }
         ],
         detail: {
@@ -41,7 +42,8 @@
             }
           ],
           links: [
-            { label: 'Google Play', url: 'https://play.google.com/store/apps/details?id=com.ourora.connect&hl=en_IN', icon: 'play' },
+            { label: 'App Store', url: 'https://apps.apple.com/us/app/ourora-connect/id6759134873', icon: 'apple' },
+            { label: 'Google Play', url: 'https://play.google.com/store/apps/details?id=com.ourora.connect', icon: 'play' },
             { label: 'Launch X Post', url: 'https://x.com/0p3nsky_/status/2055249561841795282', icon: 'twitter' },
             { label: 'Website', url: 'https://ourora.in', icon: 'external' }
           ]
@@ -51,9 +53,13 @@
         id: 'khwaaish',
         role: 'Lead Flutter Developer',
         organization: 'Khwaaish AI / Eastri',
+        organizationUrl: 'https://www.khwaaish.com/',
         duration: 'Oct 2025 \u2013 Present',
         summary: 'Building a personal AI agent mobile app for autonomous ordering, booking, and purchasing, while also improving a local laundry services app.',
         tags: ['Flutter', 'AI Agents', 'System Design', 'API Integration'],
+        links: [
+          { label: 'Website', url: 'https://www.khwaaish.com/', icon: 'external' }
+        ],
         detail: {
           title: 'Lead Flutter Developer',
           subtitle: 'Khwaaish AI / Eastri',
@@ -74,6 +80,7 @@
             }
           ],
           links: [
+            { label: 'Website', url: 'https://www.khwaaish.com/', icon: 'external' },
             { label: 'Khwaaish AI', url: 'https://www.linkedin.com/company/khwaaish/', icon: 'external' },
             { label: 'Eastri', url: 'https://www.linkedin.com/company/eastri/', icon: 'external' }
           ]
