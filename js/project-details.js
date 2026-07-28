@@ -252,38 +252,34 @@
         }
       },
       {
-        id: 'specgen-chatbot',
-        title: 'SpecGen Chatbot',
-        badge: 'In Progress',
-        duration: 'In Progress',
-        summary: 'AI-powered product spec generator with a Crawl4AI scraper. Feed it a product page, get a structured specification document.',
-        tags: ['Flutter', 'Python', 'FastAPI', 'Crawl4AI', 'LLMs'],
+        id: 'pcbuildsage',
+        title: 'PCBuildSage',
+        badge: 'Open Source',
+        duration: 'Active Development',
+        summary: 'Open-source AI agent harness & PC part picker with local retailer price scraping, deterministic hardware rules engine, and multi-LLM support.',
+        tags: ['Next.js', 'React', 'TypeScript', 'Python', 'Crawl4AI', 'SQLite', 'LLMs', 'CLI'],
         links: [
-          { label: 'Source', url: 'https://github.com/ManishModak/specgen-chatbot', icon: 'github' }
+          { label: 'Source', url: 'https://github.com/ManishModak/pcbuildsage', icon: 'github' }
         ],
         detail: {
-          subtitle: 'AI Specification Generator',
-          description: 'AI-powered product specification generator with Crawl4AI scraper integration.',
+          subtitle: 'Open-Source AI PC Part Picker & Compatibility Harness',
+          description: 'Compare live PC component prices from local retailers, chat with an AI consultant backed by a deterministic compatibility engine, and build PCs guaranteed free of hallucinations.',
           sections: [
             {
               title: 'Why I Built This',
-              body: 'Writing product spec sheets by reading long articles, feature lists, and documentation manually is tedious. I wanted a simple chat interface where a link can be dropped in and the system extracts, structures, and compiles a comprehensive specification sheet.'
+              body: 'PCPartPicker does not cover local prices outside the US (such as India), static price aggregators offer zero compatibility guidance, and general LLMs hallucinate hardware specs. PCBuildSage fixes all three with local-first retailer scraping and deterministic rules enforcement.'
             },
             {
-              title: 'Core Problem',
-              body: 'Manual collection of specifications from complex landing pages takes hours and is easy to get wrong.'
-            },
-            {
-              title: 'System Architecture',
-              body: 'A Flutter frontend talks to a Python FastAPI backend running Crawl4AI parsing pipelines.'
+              title: 'Core Architecture & Harness',
+              body: 'Functions as an Agent & Execution Harness orchestrating multi-LLM fallbacks (Gemini, Ollama, OpenRouter), tool calling, deterministic hardware rules validation (sockets, DDR generations, PSU wattage, physical clearance), and dynamic retailer scraping via Crawl4AI/Playwright.'
             },
             {
               title: 'Technical Implementation and Stack',
-              body: 'Built using Flutter, Python, FastAPI, Crawl4AI, and LLM-based extraction flows.'
+              body: 'Built using Next.js 15, React 19, TypeScript, Python 3.11+, SQLite, Crawl4AI, Tailwind CSS, and a scriptable CLI.'
             }
           ],
           links: [
-            { label: 'GitHub Source', url: 'https://github.com/ManishModak/specgen-chatbot', icon: 'github' }
+            { label: 'GitHub Source', url: 'https://github.com/ManishModak/pcbuildsage', icon: 'github' }
           ]
         }
       }
