@@ -628,15 +628,22 @@
       return row;
     }
 
-    function createStageMedia(item) {
+    // Builds the viewer media and reports its real shape so the frame can match it.
+    function createStageMedia(item, onSize) {
       if (isTrueVideo(item.url)) {
         const video = createElement('video', {
           attrs: { src: item.url, poster: item.poster, controls: true, autoplay: true, muted: true, loop: true, playsinline: true, preload: 'metadata' }
         });
         video.muted = true;
+        video.addEventListener('loadedmetadata', () => onSize(video.videoWidth, video.videoHeight), { once: true });
+        video.addEventListener('error', () => onSize(16, 9), { once: true });
         return video;
       }
-      return createElement('img', { attrs: { src: item.url, alt: item.caption || '', decoding: 'async' } });
+      const img = createElement('img', { attrs: { alt: item.caption || '', decoding: 'async' } });
+      img.addEventListener('load', () => onSize(img.naturalWidth, img.naturalHeight), { once: true });
+      img.addEventListener('error', () => onSize(16, 9), { once: true });
+      img.src = item.url;
+      return img;
     }
 
     // One large viewer; thumbnails underneath swap what it shows.
@@ -650,7 +657,12 @@
 
       function show(index) {
         const item = media[index];
-        screen.replaceChildren(createStageMedia(item));
+        screen.classList.remove('sized');
+        screen.replaceChildren(createStageMedia(item, (w, h) => {
+          if (!w || !h) return;
+          screen.style.setProperty('--ar', String(w / h));
+          screen.classList.add('sized');
+        }));
         caption.textContent = item.caption || '';
         if (!thumbs) return;
         Array.from(thumbs.children).forEach((thumb, i) => {
