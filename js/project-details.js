@@ -9,6 +9,9 @@
  * - visual: what the tile shows ({ type: 'video' | 'youtube' | 'pcbs' | 'mobilespec' }).
  * - metric: optional headline number shown on the tile.
  * - detail: optional full-screen case study; tiles without one link out instead.
+ *   detail.highlights: optional key numbers shown under the case study header.
+ *   detail.media: the first item opens in the case study viewer, the rest become thumbnails.
+ *   A video item may set poster, shown before it loads and as its thumbnail.
  */
 (function () {
   'use strict';
@@ -81,6 +84,11 @@
         detail: {
           subtitle: 'Founding Engineer · Ourora Expressions',
           duration: 'Feb 2026 – Present',
+          highlights: [
+            { value: '7k+', label: 'downloads on iOS and Android' },
+            { value: '50+', label: 'post-alpha issues resolved' },
+            { value: '~30%', label: 'better performance and reliability' }
+          ],
           description: 'Ourora is one private app made for just the two of you. No public profile, no groups, no forwards. I lead the Flutter app for iOS and Android with the founder, from architecture to store releases.',
           sections: [
             {
@@ -98,8 +106,8 @@
             }
           ],
           media: [
-            { url: 'images/ourora/launch-film.mp4', caption: 'Launch film' },
-            { url: 'images/ourora/demo.mp4', caption: 'Product walkthrough on iPhone and Android' }
+            { url: 'images/ourora/demo.mp4', poster: 'images/ourora/demo-poster.jpg', caption: 'Product walkthrough on iPhone and Android' },
+            { url: 'images/ourora/launch-film.mp4', poster: 'images/ourora/launch-poster.jpg', caption: 'Launch film' }
           ],
           links: [
             { label: 'App Store', url: 'https://apps.apple.com/us/app/ourora-connect/id6759134873', icon: 'apple' },
@@ -124,6 +132,11 @@
         detail: {
           subtitle: 'Open-source AI PC build planner',
           duration: 'Active development',
+          highlights: [
+            { value: '5+', label: 'Indian retailers scraped' },
+            { value: '2\u00d7', label: 'catalog refreshes a day' },
+            { value: '5', label: 'LLM providers with fallback' }
+          ],
           description: 'Describe your budget and needs, get builds from parts in stock at Indian retailers, refreshed twice a day, with exact totals and compatibility checked by code, not the AI.',
           sections: [
             {
@@ -165,6 +178,11 @@
         detail: {
           subtitle: 'Faster on-device LLM inference on Arm Android',
           duration: '2026',
+          highlights: [
+            { value: '2.07\u00d7', label: 'faster sustained decode' },
+            { value: '9.4\u00d7', label: 'lower decode variance' },
+            { value: '58%', label: 'cut in p99 time to first token' }
+          ],
           description: 'An evidence-led execution policy optimizer for llama.cpp on Arm Android. It discovers the CPU topology, measures prefill and decode separately, and removes spin-wait contention on big.LITTLE chips.',
           sections: [
             {

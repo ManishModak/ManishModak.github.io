@@ -6,7 +6,7 @@
  * - Play loop videos and visuals only while visible; hero stat count-up; copy email.
  * - Manage scroll reveal, active navigation, and smooth scrolling.
  * - Render the full-screen detail view without injecting untrusted text as HTML.
- * - Manage media lightbox, focus restoration, keyboard access, and history state.
+ * - Manage case study focus restoration, keyboard access, and history state.
  */
 (function () {
   'use strict';
@@ -32,7 +32,6 @@
     '[tabindex]:not([tabindex="-1"])'
   ].join(',');
 
-  const VIDEO_EXTENSIONS = ['.gif', '.mp4', '.webm', '.mov'];
   const TRUE_VIDEO_EXTENSIONS = ['.mp4', '.webm', '.mov'];
 
   function $(selector, root) {
@@ -93,11 +92,6 @@
     }
 
     return '#';
-  }
-
-  function isVideoLike(url) {
-    const lower = String(url || '').toLowerCase().split(/[?#]/)[0];
-    return VIDEO_EXTENSIONS.some((extension) => lower.endsWith(extension));
   }
 
   function isTrueVideo(url) {
@@ -594,135 +588,164 @@
       });
     }
 
-    function renderDetailSection(section) {
-      const wrapper = createElement('section', { className: 'detail-body-section' });
-      wrapper.append(createElement('h2', { className: 'detail-section-title', text: section.title }));
+    // Case study layout: header + meta, key numbers, media stage, split sections, next link.
+    function renderMeta(detail) {
+      const meta = createElement('dl', { className: 'cs-meta' });
+      const add = (label, value) => {
+        if (!value) return;
+        const cell = createElement('div', { className: 'cs-meta-item' });
+        cell.append(createElement('dt', { text: label }));
+        const dd = createElement('dd');
+        dd.append(value.nodeType ? value : document.createTextNode(value));
+        cell.append(dd);
+        meta.append(cell);
+      };
 
-      if (Array.isArray(section.items) && section.items.length) {
-        const list = createElement('ul', { className: 'detail-features' });
-        section.items.forEach((item) => list.append(createElement('li', { text: item })));
-        wrapper.append(list);
+      add('Timeline', detail.duration);
+      add('Stack', (detail.tags || []).join(', '));
+      if (detail.links && detail.links.length) {
+        const links = createElement('span', { className: 'cs-meta-links' });
+        detail.links.forEach((link) => {
+          const anchor = createElement('a', {
+            attrs: { href: getSafeHref(link.url), target: '_blank', rel: 'noopener' }
+          });
+          anchor.append(document.createTextNode(link.label));
+          appendIcon(anchor, 'external');
+          links.append(anchor);
+        });
+        add('Links', links);
+      }
+      return meta;
+    }
+
+    function renderHighlights(highlights) {
+      const row = createElement('dl', { className: 'cs-highlights' });
+      highlights.forEach((item) => {
+        const cell = createElement('div', { className: 'cs-highlight' });
+        cell.append(createElement('dd', { text: item.value }), createElement('dt', { text: item.label }));
+        row.append(cell);
+      });
+      return row;
+    }
+
+    function createStageMedia(item) {
+      if (isTrueVideo(item.url)) {
+        const video = createElement('video', {
+          attrs: { src: item.url, poster: item.poster, controls: true, autoplay: true, muted: true, loop: true, playsinline: true, preload: 'metadata' }
+        });
+        video.muted = true;
+        return video;
+      }
+      return createElement('img', { attrs: { src: item.url, alt: item.caption || '', decoding: 'async' } });
+    }
+
+    // One large viewer; thumbnails underneath swap what it shows.
+    function renderStage(media) {
+      const wrapper = createElement('section', { className: 'cs-stage', attrs: { 'aria-label': 'Demos and media' } });
+      const screen = createElement('div', { className: 'cs-stage-screen' });
+      const caption = createElement('p', { className: 'cs-stage-caption' });
+      wrapper.append(screen, caption);
+
+      const thumbs = media.length > 1 ? createElement('div', { className: 'cs-thumbs', attrs: { role: 'tablist' } }) : null;
+
+      function show(index) {
+        const item = media[index];
+        screen.replaceChildren(createStageMedia(item));
+        caption.textContent = item.caption || '';
+        if (!thumbs) return;
+        Array.from(thumbs.children).forEach((thumb, i) => {
+          thumb.classList.toggle('active', i === index);
+          thumb.setAttribute('aria-selected', i === index ? 'true' : 'false');
+        });
       }
 
-      if (section.body) {
-        wrapper.append(createTextWithBreaks(section.body, 'detail-desc-text'));
+      if (thumbs) {
+        media.forEach((item, index) => {
+          const thumb = createElement('button', {
+            className: 'cs-thumb',
+            attrs: { type: 'button', role: 'tab', 'aria-label': 'Show: ' + (item.caption || 'media ' + (index + 1)) }
+          });
+          if (item.poster) {
+            thumb.append(createElement('img', { attrs: { src: item.poster, alt: '', loading: 'lazy' } }));
+          } else if (isTrueVideo(item.url)) {
+            const preview = createElement('video', { attrs: { src: item.url + '#t=1', muted: true, playsinline: true, preload: 'metadata' } });
+            preview.muted = true;
+            thumb.append(preview);
+          } else {
+            thumb.append(createElement('img', { attrs: { src: item.url, alt: '', loading: 'lazy' } }));
+          }
+          thumb.append(createElement('span', { text: item.caption || '' }));
+          thumb.addEventListener('click', () => show(index));
+          thumbs.append(thumb);
+        });
+        wrapper.append(thumbs);
       }
 
+      show(0);
       return wrapper;
     }
 
-    function renderMediaItem(item, globalIndex) {
-      const url = item.url || '';
-      const caption = item.caption || 'Project media';
-      const trueVideo = isTrueVideo(url);
-      const button = createElement('button', {
-        className: 'detail-gallery-item',
-        attrs: {
-          type: 'button',
-          'data-media-index': globalIndex,
-          'data-src': url,
-          'data-kind': trueVideo ? 'video' : 'image',
-          'data-caption': caption,
-          'aria-label': 'Open media preview: ' + caption
-        }
-      });
+    function renderDetailSection(section) {
+      const wrapper = createElement('section', { className: 'cs-section' });
+      wrapper.append(createElement('h2', { className: 'cs-section-title', text: section.title }));
+      const body = createElement('div', { className: 'cs-section-body' });
 
-      if (trueVideo) {
-        const video = createElement('video', {
-          attrs: {
-            src: url,
-            autoplay: true,
-            loop: true,
-            muted: true,
-            playsinline: true,
-            preload: 'metadata'
-          }
-        });
-        video.muted = true;
-        button.append(video);
-      } else {
-        button.append(createElement('img', {
-          attrs: {
-            src: url,
-            alt: caption,
-            loading: 'lazy',
-            decoding: 'async'
-          }
-        }));
+      if (Array.isArray(section.items) && section.items.length) {
+        const list = createElement('ul', { className: 'cs-list' });
+        section.items.forEach((item) => list.append(createElement('li', { text: item })));
+        body.append(list);
       }
+      if (section.body) {
+        body.append(createTextWithBreaks(section.body, 'cs-text'));
+      }
+      wrapper.append(body);
+      return wrapper;
+    }
 
-      button.append(createElement('span', { className: 'detail-gallery-caption', text: caption }));
+    // Case studies in the order they appear in the work grid.
+    function getNextDetail(id) {
+      const ids = window.PORTFOLIO_DATA.projects.map((item) => item.id).filter((itemId) => getDetail(itemId));
+      const next = ids[(ids.indexOf(id) + 1) % ids.length];
+      return next && next !== id ? getDetail(next) : null;
+    }
+
+    function renderNext(detail) {
+      const next = getNextDetail(detail.id);
+      if (!next) return null;
+      const button = createElement('button', {
+        className: 'cs-next',
+        attrs: { type: 'button', 'data-detail-open': next.id }
+      });
+      button.append(
+        createElement('span', { className: 'cs-next-label', text: 'Next case study' }),
+        createElement('span', { className: 'cs-next-title', text: next.title }),
+        createElement('span', { className: 'cs-next-sub', text: next.subtitle })
+      );
+      appendIcon(button, 'details');
       return button;
     }
 
-    function renderMediaSection(title, items, offset) {
-      const wrapper = createElement('section', { className: 'detail-body-section detail-media-section' });
-      wrapper.append(createElement('h2', { className: 'detail-section-title', text: title }));
-
-      const scroller = createElement('div', { className: 'detail-gallery detail-gallery-scroll' });
-      items.forEach((item, index) => scroller.append(renderMediaItem(item, offset + index)));
-      wrapper.append(scroller);
-      return wrapper;
-    }
-
-    function renderDetailLinks(links) {
-      const wrapper = createElement('section', { className: 'detail-body-section' });
-      wrapper.append(createElement('h2', { className: 'detail-section-title', text: 'Links' }));
-
-      const linkWrap = createElement('div', { className: 'detail-links' });
-      links.forEach((link) => {
-        const anchor = createElement('a', {
-          className: 'detail-btn',
-          attrs: {
-            href: getSafeHref(link.url),
-            target: '_blank',
-            rel: 'noopener'
-          }
-        });
-        appendIcon(anchor, link.icon || 'external');
-        anchor.append(document.createTextNode(link.label));
-        linkWrap.append(anchor);
-      });
-      wrapper.append(linkWrap);
-      return wrapper;
-    }
-
     function renderDetailContent(detail) {
-      const content = createElement('div', { className: 'detail-content-inner' });
+      const content = createElement('article', { className: 'cs' });
 
-      const hero = createElement('header', { className: 'detail-hero' });
-      const meta = createElement('div', { className: 'detail-meta' });
-      if (detail.duration) meta.append(createElement('span', { className: 'detail-duration', text: detail.duration }));
-      hero.append(meta);
-      hero.append(createElement('h1', { className: 'detail-title', text: detail.title, attrs: { id: 'detail-title' } }));
-      if (detail.subtitle) hero.append(createElement('span', { className: 'detail-company', text: detail.subtitle }));
+      const header = createElement('header', { className: 'cs-header' });
+      if (detail.subtitle) header.append(createElement('p', { className: 'cs-kicker', text: detail.subtitle }));
+      header.append(createElement('h1', { className: 'cs-title', text: detail.title, attrs: { id: 'detail-title' } }));
+      if (detail.description) header.append(createElement('p', { className: 'cs-lead', text: detail.description }));
+      header.append(renderMeta(detail));
+      content.append(header);
 
-      if (Array.isArray(detail.tags) && detail.tags.length) {
-        const tags = createElement('div', { className: 'detail-tags' });
-        detail.tags.forEach((tag) => tags.append(createElement('span', { className: 'detail-tag', text: tag })));
-        hero.append(tags);
+      if (Array.isArray(detail.highlights) && detail.highlights.length) {
+        content.append(renderHighlights(detail.highlights));
       }
-      content.append(hero);
-
-      const media = Array.isArray(detail.media) ? detail.media : [];
-      const demos = media.filter((item) => isVideoLike(item.url));
-      const screenshots = media.filter((item) => !isVideoLike(item.url));
-
-      if (demos.length) content.append(renderMediaSection('Video Demos', demos, 0));
-      if (screenshots.length) content.append(renderMediaSection('Screenshots and Assets', screenshots, demos.length));
-
-      if (detail.description) {
-        const summary = createElement('section', { className: 'detail-body-section' });
-        summary.append(createTextWithBreaks(detail.description, 'detail-desc-text'));
-        content.append(summary);
+      if (detail.media && detail.media.length) {
+        content.append(renderStage(detail.media));
       }
 
       (detail.sections || []).forEach((section) => content.append(renderDetailSection(section)));
 
-      if (Array.isArray(detail.links) && detail.links.length) {
-        content.append(renderDetailLinks(detail.links));
-      }
-
+      const next = renderNext(detail);
+      if (next) content.append(next);
       return content;
     }
 
@@ -750,7 +773,9 @@
       if (contentWrapper) contentWrapper.setAttribute('inert', '');
 
       if (opts.pushHistory) {
-        history.pushState({ detailId: id }, '', '#detail/' + encodeURIComponent(id));
+        // Moving between case studies replaces the entry so Back still returns to the page.
+        const method = wasOpen ? 'replaceState' : 'pushState';
+        history[method]({ detailId: id }, '', '#detail/' + encodeURIComponent(id));
       }
 
       requestAnimationFrame(() => {
@@ -765,6 +790,7 @@
       const focusTarget = previouslyFocused;
 
       currentDetailId = '';
+      $$('video', detailBody).forEach((video) => video.pause());
       detailPage.classList.remove('detail--active');
       detailPage.setAttribute('aria-hidden', 'true');
       document.body.classList.remove('detail-open');
@@ -814,7 +840,7 @@
     detailBack.addEventListener('click', () => closeDetail({ restoreUrl: true, restoreFocus: true }));
 
     window.addEventListener('keydown', (event) => {
-      if (!currentDetailId || $('.media-lightbox.lightbox--active')) return;
+      if (!currentDetailId) return;
 
       if (event.key === 'Escape') {
         event.preventDefault();
@@ -839,121 +865,6 @@
     }
   }
 
-  function initLightbox() {
-    const lightbox = $('#media-lightbox');
-    const lightboxMedia = $('#lightbox-media');
-    const lightboxCaption = $('#lightbox-caption');
-    const lightboxCounter = $('#lightbox-counter');
-    const lightboxClose = $('#lightbox-close');
-    const lightboxPrev = $('#lightbox-prev');
-    const lightboxNext = $('#lightbox-next');
-    const detailBody = $('#detail-body');
-
-    if (!lightbox || !lightboxMedia || !lightboxCaption || !lightboxCounter || !detailBody) return;
-
-    let currentItems = [];
-    let currentIndex = 0;
-    let previouslyFocused = null;
-
-    function getMediaItems() {
-      return $$('.detail-gallery-item', detailBody).map((item) => ({
-        src: item.getAttribute('data-src'),
-        kind: item.getAttribute('data-kind'),
-        caption: item.getAttribute('data-caption') || ''
-      }));
-    }
-
-    function renderLightboxItem() {
-      if (!currentItems.length) return;
-
-      const item = currentItems[currentIndex];
-      const isVideo = item.kind === 'video';
-      const media = isVideo
-        ? createElement('video', { attrs: { src: item.src, autoplay: true, loop: true, muted: true, playsinline: true, controls: true } })
-        : createElement('img', { attrs: { src: item.src, alt: item.caption || 'Project media' } });
-
-      if (isVideo) media.muted = true;
-
-      lightboxMedia.replaceChildren(media);
-      lightboxCaption.textContent = item.caption;
-      lightboxCounter.textContent = currentIndex + 1 + ' / ' + currentItems.length;
-      lightboxPrev.hidden = currentItems.length <= 1;
-      lightboxNext.hidden = currentItems.length <= 1;
-    }
-
-    function openLightbox(index) {
-      currentItems = getMediaItems();
-      if (!currentItems.length) return;
-
-      currentIndex = Math.max(0, Math.min(index, currentItems.length - 1));
-      previouslyFocused = document.activeElement;
-      renderLightboxItem();
-
-      document.body.classList.add('lightbox-open');
-      lightbox.classList.add('lightbox--active');
-      lightbox.setAttribute('aria-hidden', 'false');
-      requestAnimationFrame(() => lightboxClose.focus({ preventScroll: true }));
-    }
-
-    function closeLightbox() {
-      if (!lightbox.classList.contains('lightbox--active')) return;
-
-      lightbox.classList.remove('lightbox--active');
-      lightbox.setAttribute('aria-hidden', 'true');
-      document.body.classList.remove('lightbox-open');
-      lightboxMedia.replaceChildren();
-
-      if (previouslyFocused && typeof previouslyFocused.focus === 'function') {
-        previouslyFocused.focus({ preventScroll: true });
-      }
-    }
-
-    function nextItem() {
-      if (currentItems.length <= 1) return;
-      currentIndex = (currentIndex + 1) % currentItems.length;
-      renderLightboxItem();
-    }
-
-    function previousItem() {
-      if (currentItems.length <= 1) return;
-      currentIndex = (currentIndex - 1 + currentItems.length) % currentItems.length;
-      renderLightboxItem();
-    }
-
-    detailBody.addEventListener('click', (event) => {
-      const item = event.target.closest('.detail-gallery-item');
-      if (!item) return;
-
-      event.preventDefault();
-      openLightbox(Number(item.getAttribute('data-media-index')) || 0);
-    });
-
-    lightboxClose.addEventListener('click', closeLightbox);
-    lightboxPrev.addEventListener('click', previousItem);
-    lightboxNext.addEventListener('click', nextItem);
-
-    lightbox.addEventListener('click', (event) => {
-      if (event.target === lightbox) closeLightbox();
-    });
-
-    window.addEventListener('keydown', (event) => {
-      if (!lightbox.classList.contains('lightbox--active')) return;
-
-      if (event.key === 'Escape') {
-        event.preventDefault();
-        closeLightbox();
-      } else if (event.key === 'ArrowRight') {
-        event.preventDefault();
-        nextItem();
-      } else if (event.key === 'ArrowLeft') {
-        event.preventDefault();
-        previousItem();
-      } else {
-        trapFocus(event, lightbox);
-      }
-    });
-  }
-
   function init() {
     renderDataDrivenContent();
     initScrollReveal();
@@ -965,7 +876,6 @@
     initCopyEmail();
     initActiveNav();
     initDetailPage();
-    initLightbox();
   }
 
   if (document.readyState === 'loading') {
