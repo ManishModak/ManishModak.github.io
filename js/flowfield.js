@@ -4,6 +4,14 @@
  * The simulation runs on a fixed 60 Hz timestep and renders only after a
  * completed simulation tick. That keeps particle velocity, tail length, and
  * fade behavior consistent on 60 Hz, 120 Hz, 144 Hz, and 240 Hz displays.
+ *
+ * Trails fade in three stages: the bright line fades by painting the background
+ * at low alpha each tick; 8-bit blending stalls that fade, leaving a faint ghost
+ * tint; a gentle periodic cleanup pass then wears the ghost down to the true
+ * background colour over a few seconds.
+ *
+ * The loop pauses while the tab is hidden or a case study covers the page. With
+ * reduced motion it paints one settled frame and does not animate.
  */
 (function () {
   'use strict';
@@ -32,6 +40,12 @@
   const MAX_ELAPSED_MS = 100;
   const MAX_STEPS_PER_FRAME = 5;
   const RESIZE_DEBOUNCE_MS = 120;
+  // Ghost cleanup: every N ticks subtract one level, then clamp back up to the background.
+  // Larger N keeps the ghost stage longer; N = 10 clears it in roughly 3-4 seconds.
+  const CLEANUP_EVERY_TICKS = 10;
+  const CLEANUP_STEP = 'rgb(1, 1, 1)';
+  // Ticks simulated up front for the reduced-motion still frame.
+  const STATIC_FRAME_TICKS = 220;
 
   let canvas;
   let ctx;
@@ -46,6 +60,7 @@
   let running = false;
   let lastTime = 0;
   let accumulator = FIXED_STEP_MS;
+  let ticksSinceCleanup = 0;
   let resizeTimer = 0;
   let lastKnownDpr = 0;
 
@@ -69,11 +84,12 @@
       this.vx = 0;
       this.vy = 0;
       this.life = Math.random() * 300 + 200;
-      this.maxLife = this.life;
 
-      this.hue = settings.colorHueBase + (Math.random() - 0.5) * settings.colorHueRange;
-      this.lightness = settings.colorLightnessMin + Math.random() * (settings.colorLightnessMax - settings.colorLightnessMin);
-      this.alpha = settings.colorAlphaMin + Math.random() * (settings.colorAlphaMax - settings.colorAlphaMin);
+      const hue = settings.colorHueBase + (Math.random() - 0.5) * settings.colorHueRange;
+      const lightness = settings.colorLightnessMin + Math.random() * (settings.colorLightnessMax - settings.colorLightnessMin);
+      const alpha = settings.colorAlphaMin + Math.random() * (settings.colorAlphaMax - settings.colorAlphaMin);
+      // Built once per spawn instead of every frame.
+      this.color = 'hsla(' + hue + ', ' + settings.colorSaturation + '%, ' + lightness + '%, ' + alpha + ')';
       this.lineWidth = settings.lineWidth + Math.random() * 0.6;
     }
 
@@ -121,8 +137,6 @@
       const outside = this.x < -margin || this.x > width + margin || this.y < -margin || this.y > height + margin;
       if (outside || this.life <= 0) {
         this.reset();
-        this.prevX = this.x;
-        this.prevY = this.y;
       }
     }
 
@@ -130,7 +144,7 @@
       ctx.beginPath();
       ctx.moveTo(this.prevX, this.prevY);
       ctx.lineTo(this.x, this.y);
-      ctx.strokeStyle = 'hsla(' + this.hue + ', ' + settings.colorSaturation + '%, ' + this.lightness + '%, ' + this.alpha + ')';
+      ctx.strokeStyle = this.color;
       ctx.lineWidth = this.lineWidth;
       ctx.stroke();
     }
@@ -144,15 +158,22 @@
     return window.matchMedia && window.matchMedia(query).matches;
   }
 
-  function computeSettings() {
-    const coarsePointer = mediaQueryMatches('(pointer: coarse)');
-    const reducedMotion = mediaQueryMatches('(prefers-reduced-motion: reduce)');
+  function isCoarsePointer() {
+    return mediaQueryMatches('(pointer: coarse)');
+  }
+
+  function isReducedMotion() {
+    return mediaQueryMatches('(prefers-reduced-motion: reduce)');
+  }
+
+  function computeSettings(viewWidth, viewHeight) {
+    const coarsePointer = isCoarsePointer();
     const lowPowerDevice = (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) ||
       (navigator.deviceMemory && navigator.deviceMemory <= 4);
-    const area = Math.max(1, window.innerWidth * window.innerHeight);
+    const area = Math.max(1, viewWidth * viewHeight);
 
     let density = coarsePointer ? 0.0002 : 0.00043;
-    let minParticles = coarsePointer ? 110 : 300;
+    const minParticles = coarsePointer ? 110 : 300;
     let maxParticles = coarsePointer ? 440 : 900;
 
     if (lowPowerDevice) {
@@ -160,21 +181,9 @@
       maxParticles = coarsePointer ? 320 : 700;
     }
 
-    if (reducedMotion) {
-      density = 0.00007;
-      minParticles = 35;
-      maxParticles = 90;
-    }
-
-    const particleCount = clamp(Math.round(area * density), minParticles, maxParticles);
-    const motionScale = reducedMotion ? 0.35 : 1;
-
     return {
       ...BASE,
-      particleCount,
-      particleSpeed: BASE.particleSpeed * motionScale,
-      particleMaxSpeed: BASE.particleMaxSpeed * motionScale,
-      noiseSpeed: BASE.noiseSpeed * motionScale,
+      particleCount: clamp(Math.round(area * density), minParticles, maxParticles),
       mouseRadius: coarsePointer ? 150 : BASE.mouseRadius,
       dprCap: coarsePointer || lowPowerDevice ? 1.5 : 2
     };
@@ -184,17 +193,25 @@
     return Math.min(window.devicePixelRatio || 1, nextSettings.dprCap || 2);
   }
 
-  function syncCanvasSize(force) {
-    const nextSettings = computeSettings();
+  // Resizes the canvas to the viewport. Returns true when it rebuilt (and so cleared) the canvas.
+  function syncCanvasSize() {
     const nextWidth = Math.max(1, window.innerWidth);
-    const nextHeight = Math.max(1, window.innerHeight);
+    let nextHeight = Math.max(1, window.innerHeight);
+
+    // Mobile address bars resize the viewport while scrolling. Keep the taller size
+    // for the same width so the bar reappearing does not clear the trails.
+    if (isCoarsePointer() && nextWidth === width && nextHeight < height) {
+      nextHeight = height;
+    }
+
+    const nextSettings = computeSettings(nextWidth, nextHeight);
     const nextDpr = getCanvasDpr(nextSettings);
     const sizeChanged = nextWidth !== width || nextHeight !== height || nextDpr !== dpr;
     const countChanged = !settings || nextSettings.particleCount !== settings.particleCount;
 
     settings = nextSettings;
 
-    if (!force && !sizeChanged && !countChanged) return;
+    if (!sizeChanged && !countChanged) return false;
 
     width = nextWidth;
     height = nextHeight;
@@ -211,6 +228,7 @@
     ctx.fillRect(0, 0, width, height);
 
     reconcileParticles(settings.particleCount);
+    return true;
   }
 
   function reconcileParticles(targetCount) {
@@ -231,13 +249,38 @@
     zOffset += settings.noiseSpeed;
   }
 
+  // |dst - 1| then max(dst, background): the ghost steps down to the background, bright trails barely change.
+  function cleanupResidue() {
+    ctx.globalCompositeOperation = 'difference';
+    ctx.fillStyle = CLEANUP_STEP;
+    ctx.fillRect(0, 0, width, height);
+    ctx.globalCompositeOperation = 'lighten';
+    ctx.fillStyle = settings.background;
+    ctx.fillRect(0, 0, width, height);
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
   function render(ticks) {
     const fadeAlpha = 1 - Math.pow(1 - settings.trailFadePerTick, ticks || 1);
     ctx.fillStyle = 'rgba(10, 10, 15, ' + fadeAlpha + ')';
     ctx.fillRect(0, 0, width, height);
 
+    ticksSinceCleanup += ticks || 1;
+    if (ticksSinceCleanup >= CLEANUP_EVERY_TICKS) {
+      cleanupResidue();
+      ticksSinceCleanup = 0;
+    }
+
     for (let i = 0; i < particles.length; i += 1) {
       particles[i].draw();
+    }
+  }
+
+  // Settles the field for a while and paints a single frame, for reduced motion.
+  function paintStaticFrame() {
+    for (let i = 0; i < STATIC_FRAME_TICKS; i += 1) {
+      simulationStep();
+      render(1);
     }
   }
 
@@ -246,7 +289,7 @@
     if (!running) return;
 
     if ((window.devicePixelRatio || 1) !== lastKnownDpr) {
-      syncCanvasSize(true);
+      syncCanvasSize();
     }
 
     if (!lastTime) lastTime = timestamp;
@@ -282,11 +325,23 @@
     rafId = 0;
   }
 
+  // Animate only when someone can see it: tab visible, no case study covering the page, motion allowed.
+  function updateRunState() {
+    const covered = document.body.classList.contains('detail-open');
+    if (document.hidden || covered || isReducedMotion()) {
+      stop();
+    } else {
+      start();
+    }
+  }
+
   function scheduleResize() {
     window.clearTimeout(resizeTimer);
     resizeTimer = window.setTimeout(() => {
-      syncCanvasSize(true);
+      const cleared = syncCanvasSize();
       accumulator = FIXED_STEP_MS;
+      if (isReducedMotion() && cleared) paintStaticFrame();
+      updateRunState();
     }, RESIZE_DEBOUNCE_MS);
   }
 
@@ -316,19 +371,23 @@
     window.addEventListener('pointerup', onPointerEnd, { passive: true });
     window.addEventListener('pointercancel', deactivatePointer, { passive: true });
     window.addEventListener('blur', deactivatePointer, { passive: true });
+    document.addEventListener('visibilitychange', updateRunState);
 
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) stop();
-      else start();
-    });
+    // main.js toggles body.detail-open around the full-screen case study.
+    new MutationObserver(updateRunState).observe(document.body, { attributes: true, attributeFilter: ['class'] });
 
     if (window.matchMedia) {
-      ['(prefers-reduced-motion: reduce)', '(pointer: coarse)'].forEach((query) => {
-        const media = window.matchMedia(query);
-        if (typeof media.addEventListener === 'function') {
-          media.addEventListener('change', scheduleResize);
-        }
-      });
+      const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      if (typeof motion.addEventListener === 'function') {
+        motion.addEventListener('change', () => {
+          if (motion.matches) paintStaticFrame();
+          updateRunState();
+        });
+      }
+      const coarse = window.matchMedia('(pointer: coarse)');
+      if (typeof coarse.addEventListener === 'function') {
+        coarse.addEventListener('change', scheduleResize);
+      }
     }
   }
 
@@ -340,11 +399,15 @@
     if (!ctx) return;
 
     simplex = new SimplexNoise(42);
-    settings = computeSettings();
-    syncCanvasSize(true);
+    syncCanvasSize();
     bindEvents();
-    render(1);
-    start();
+
+    if (isReducedMotion()) {
+      paintStaticFrame();
+    } else {
+      render(1);
+    }
+    updateRunState();
   }
 
   if (document.readyState === 'loading') {
