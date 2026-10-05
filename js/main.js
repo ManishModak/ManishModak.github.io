@@ -2,7 +2,8 @@
  * Main portfolio interactions.
  *
  * Responsibilities:
- * - Render data-driven cards from js/project-details.js.
+ * - Render the work grid, timeline and lists from js/project-details.js.
+ * - Play loop videos and visuals only while visible; hero stat count-up; copy email.
  * - Manage scroll reveal, active navigation, and smooth scrolling.
  * - Render the full-screen detail view without injecting untrusted text as HTML.
  * - Manage media lightbox, focus restoration, keyboard access, and history state.
@@ -114,11 +115,11 @@
   }
 
   function getCategoryLabel(category) {
-    return category === 'experience' ? 'Experience' : 'Projects';
+    return category === 'experience' ? 'Experience' : 'Work';
   }
 
   function getCategoryAnchor(category) {
-    return category === 'experience' ? '#experience' : '#projects';
+    return category === 'experience' ? '#experience' : '#work';
   }
 
   function createTextWithBreaks(text, className) {
@@ -168,136 +169,203 @@
     }
   }
 
-  function renderCardLinks(links, detail, options) {
-    const container = createElement('div', { className: 'project-links' });
-    const opts = options || {};
-
+  function renderLinks(links, className) {
+    const container = createElement('div', { className: className || 'tile-links' });
     (links || []).forEach((link) => {
       const anchor = createElement('a', {
-        className: 'project-link',
-        attrs: {
-          href: getSafeHref(link.url),
-          target: '_blank',
-          rel: 'noopener'
-        }
+        className: 'tile-link',
+        attrs: { href: getSafeHref(link.url), target: '_blank', rel: 'noopener' }
       });
       appendIcon(anchor, link.icon || 'external');
       anchor.append(document.createTextNode(link.label));
       container.append(anchor);
     });
-
-    const media = detail && Array.isArray(detail.media) ? detail.media : [];
-    const hasVideos = media.some((item) => isVideoLike(item.url));
-    const hasImages = media.some((item) => !isVideoLike(item.url));
-
-    if (opts.includeMediaTags && hasVideos) {
-      container.append(createDetailButton(detail.id, 'Demos', 'video', 'detail-media-tag'));
-    }
-    if (opts.includeMediaTags && hasImages) {
-      container.append(createDetailButton(detail.id, 'Screenshots', 'image', 'detail-media-tag'));
-    }
-
-    container.append(createDetailButton(detail.id, 'Details', 'details'));
     return container;
   }
 
-  function createDetailButton(id, label, iconName, extraClassName) {
+  function createDetailButton(id, label) {
     const detail = getDetail(id);
     const button = createElement('button', {
-      className: ['project-link', 'detail-open-link', extraClassName].filter(Boolean).join(' '),
+      className: 'tile-link tile-link--primary',
       attrs: {
         type: 'button',
         'data-detail-open': id,
-        'aria-label': 'Open details for ' + (detail ? detail.title : id)
+        'aria-label': 'Open case study for ' + (detail ? detail.title : id)
       }
     });
-    appendIcon(button, iconName || 'details');
     button.append(document.createTextNode(label));
+    appendIcon(button, 'details');
     return button;
   }
 
-  function renderExperienceCard(item) {
-    const detail = getDetail(item.id);
-    const card = createElement('article', {
-      className: 'experience-card clickable-card',
+  // Muted looping video that main.js plays only while it is on screen.
+  function createLoopVideo(src, poster, fit) {
+    const video = createElement('video', {
+      className: 'tile-video tile-video--' + (fit || 'cover'),
       attrs: {
-        tabindex: '0',
-        'data-id': item.id,
-        'aria-label': 'Open details for ' + item.role
+        src: src,
+        poster: poster,
+        loop: true,
+        muted: true,
+        playsinline: true,
+        preload: 'none',
+        'data-inview-play': true,
+        'aria-hidden': 'true'
       }
     });
-
-    const header = createElement('div', { className: 'experience-header' });
-    const titleGroup = createElement('div');
-    titleGroup.append(createElement('h3', { className: 'experience-role', text: item.role }));
-
-    if (item.organizationUrl) {
-      titleGroup.append(createElement('a', {
-        className: 'experience-company',
-        text: item.organization,
-        attrs: { href: getSafeHref(item.organizationUrl), target: '_blank', rel: 'noopener' }
-      }));
-    } else {
-      titleGroup.append(createElement('span', { className: 'experience-company', text: item.organization }));
-    }
-
-    header.append(titleGroup, createElement('span', { className: 'experience-duration', text: item.duration }));
-    card.append(header);
-    card.append(createElement('p', { className: 'experience-desc', text: item.summary }));
-    card.append(renderCardLinks(item.links || [], detail, { includeMediaTags: false }));
-
-    return card;
+    video.muted = true;
+    return video;
   }
 
-  function renderProjectCard(item) {
-    const detail = getDetail(item.id);
-    const card = createElement('article', {
-      className: 'project-card clickable-card',
-      attrs: {
-        tabindex: '0',
-        'data-id': item.id,
-        'aria-label': 'Open details for ' + item.title
-      }
+  // Animated mock of a PCBuildSage answer: prompt, rule-checked parts, total.
+  function createPcbsVisual() {
+    // Illustrative build; prices add up to the total shown.
+    const parts = [
+      ['CPU', 'Ryzen 5 7600', '\u20b916,990'],
+      ['GPU', 'RTX 4060 8GB', '\u20b927,990'],
+      ['Board', 'B650M DDR5', '\u20b913,200'],
+      ['RAM', '32GB DDR5 6000', '\u20b99,350'],
+      ['PSU', '650W 80+ Gold', '\u20b96,450'],
+      ['More', 'SSD, case, cooler', '\u20b913,797']
+    ];
+    const wrap = createElement('div', { className: 'pcbs', attrs: { 'aria-hidden': 'true' } });
+    wrap.append(createElement('div', { className: 'pcbs-prompt', text: 'Quiet gaming PC under ₹90k, all in stock' }));
+    const list = createElement('ul', { className: 'pcbs-parts' });
+    parts.forEach(([kind, name, price]) => {
+      list.append(createElement('li', null, [
+        createElement('span', { className: 'pcbs-kind', text: kind }),
+        createElement('span', { className: 'pcbs-name', text: name }),
+        createElement('span', { className: 'pcbs-price', text: price }),
+        createElement('span', { className: 'pcbs-check', text: '✓' })
+      ]));
+    });
+    wrap.append(list);
+    wrap.append(createElement('div', { className: 'pcbs-total' }, [
+      createElement('span', { text: 'Socket · DDR5 · PSU headroom verified' }),
+      createElement('strong', { text: '₹87,777' })
+    ]));
+    return wrap;
+  }
+
+  // Bar comparison for MobileSpec's decode speed result.
+  function createMobilespecVisual() {
+    const wrap = createElement('div', { className: 'mspec', attrs: { 'aria-hidden': 'true' } });
+    wrap.append(createElement('div', { className: 'mspec-big' }, [
+      createElement('span', { text: '2.07' }),
+      createElement('small', { text: '× faster decode' })
+    ]));
+    [['Stock llama.cpp', '5.39 tok/s', 48], ['MobileSpec', '11.18 tok/s', 100]].forEach(([label, value, width]) => {
+      const row = createElement('div', { className: 'mspec-row' });
+      row.append(createElement('span', { className: 'mspec-label', text: label }));
+      const bar = createElement('span', { className: 'mspec-bar' });
+      bar.style.setProperty('--w', width + '%');
+      row.append(bar, createElement('span', { className: 'mspec-value', text: value }));
+      wrap.append(row);
+    });
+    return wrap;
+  }
+
+  function createTileVisual(visual) {
+    const holder = createElement('div', { className: 'tile-visual tile-visual--' + (visual ? visual.type : 'none') });
+    if (!visual) return holder;
+
+    if (visual.type === 'video') {
+      holder.append(createLoopVideo(visual.src, visual.poster, visual.fit));
+    } else if (visual.type === 'youtube') {
+      holder.append(createElement('img', {
+        className: 'tile-thumb',
+        attrs: { src: 'https://i.ytimg.com/vi/' + visual.id + '/hqdefault.jpg', alt: '', loading: 'lazy', decoding: 'async' }
+      }));
+    } else if (visual.type === 'pcbs') {
+      holder.append(createPcbsVisual());
+    } else if (visual.type === 'mobilespec') {
+      holder.append(createMobilespecVisual());
+    }
+    return holder;
+  }
+
+  function renderWorkTile(item) {
+    const hasDetail = Boolean(getDetail(item.id));
+    const tile = createElement('article', {
+      className: 'tile tile--' + (item.size || 'sm') + (hasDetail ? ' clickable-card' : ''),
+      attrs: hasDetail
+        ? { tabindex: '0', 'data-id': item.id, 'aria-label': 'Open case study for ' + item.title }
+        : null
+    });
+    tile.addEventListener('pointermove', (event) => {
+      const rect = tile.getBoundingClientRect();
+      tile.style.setProperty('--mx', event.clientX - rect.left + 'px');
+      tile.style.setProperty('--my', event.clientY - rect.top + 'px');
     });
 
-    const header = createElement('div', { className: 'project-header' });
-    const primaryLink = (item.links || []).find((link) => link.icon === 'github') || (item.links || [])[0];
+    tile.append(createTileVisual(item.visual));
 
-    if (primaryLink) {
-      header.append(createElement('a', {
-        className: 'project-name',
-        text: item.title,
-        attrs: { href: getSafeHref(primaryLink.url), target: '_blank', rel: 'noopener' }
-      }));
-    } else {
-      header.append(createElement('h3', { className: 'project-name', text: item.title }));
+    const body = createElement('div', { className: 'tile-body' });
+    body.append(createElement('span', { className: 'tile-kicker', text: item.kicker }));
+    body.append(createElement('h3', { className: 'tile-title', text: item.title }));
+    if (item.metric) {
+      body.append(createElement('p', { className: 'tile-metric' }, [
+        createElement('strong', { text: item.metric.value }),
+        ' ' + item.metric.label
+      ]));
+    }
+    body.append(createElement('p', { className: 'tile-desc', text: item.summary }));
+
+    if (item.tags && item.tags.length) {
+      body.append(createElement('p', { className: 'tile-stack', text: item.tags.join(' \u00b7 ') }));
     }
 
-    if (item.badge) {
-      header.append(createElement('span', { className: 'project-badge', text: item.badge }));
-    }
+    const links = renderLinks(item.links);
+    if (hasDetail) links.append(createDetailButton(item.id, 'Case study'));
+    body.append(links);
 
-    card.append(header);
-    card.append(createElement('p', { className: 'project-desc', text: item.summary }));
-    card.append(renderCardLinks(item.links || [], detail, { includeMediaTags: true }));
-
-    return card;
+    tile.append(body);
+    return tile;
   }
 
-  function renderOtherProject(item) {
+  // One editorial row per role: dates on the left, role, points and stack on the right.
+  function renderRole(meta, title, org, orgUrl, points, stack, current) {
+    const row = createElement('li', { className: 'role' + (current ? ' role--current' : '') });
+    row.append(createElement('span', { className: 'role-date', text: meta }));
+
+    const main = createElement('div', { className: 'role-main' });
+    const heading = createElement('h3', { className: 'role-title', text: title });
+    const orgEl = orgUrl
+      ? createElement('a', { className: 'role-org', text: org, attrs: { href: getSafeHref(orgUrl), target: '_blank', rel: 'noopener' } })
+      : createElement('span', { className: 'role-org', text: org });
+    main.append(heading, orgEl);
+
+    if (points && points.length) {
+      const list = createElement('ul', { className: 'role-points' });
+      points.forEach((point) => list.append(createElement('li', { text: point })));
+      main.append(list);
+    }
+    if (stack && stack.length) {
+      main.append(createElement('p', { className: 'role-stack', text: stack.join(' \u00b7 ') }));
+    }
+    row.append(main);
+    return row;
+  }
+
+  function renderTimelineItem(item) {
+    return renderRole(item.duration, item.role, item.organization, item.organizationUrl, item.points, item.tags, item.current);
+  }
+
+  function renderEducation(edu) {
+    return renderRole(edu.duration, edu.degree, edu.school + ' \u00b7 ' + edu.note, null, null, null, false);
+  }
+
+  function renderMoreBuild(item) {
     const anchor = createElement('a', {
-      className: 'other-project-item',
+      className: 'more-item',
       attrs: { href: getSafeHref(item.url), target: '_blank', rel: 'noopener' }
     });
-
-    const textWrap = createElement('div');
-    textWrap.append(createElement('div', { className: 'other-project-name', text: item.title }));
-    textWrap.append(createElement('div', { className: 'other-project-desc', text: item.description }));
-
-    const icon = createElement('span', { className: 'other-project-link' });
-    appendIcon(icon, 'external');
-
-    anchor.append(textWrap, icon);
+    const text = createElement('div');
+    text.append(createElement('span', { className: 'more-name', text: item.title }));
+    text.append(createElement('span', { className: 'more-desc', text: item.description }));
+    const label = createElement('span', { className: 'more-label', text: item.label });
+    appendIcon(label, 'external');
+    anchor.append(text, label);
     return anchor;
   }
 
@@ -305,21 +373,17 @@
     const data = window.PORTFOLIO_DATA;
     if (!data) return;
 
-    const experienceList = $('#experience-list');
-    const projectGrid = $('#project-grid');
-    const otherProjects = $('#other-projects-list');
+    const grid = $('#work-grid');
+    const timeline = $('#timeline');
+    const more = $('#more-builds');
 
-    if (experienceList) {
-      experienceList.replaceChildren(...data.experience.map(renderExperienceCard));
+    if (grid) grid.replaceChildren(...data.projects.map(renderWorkTile));
+    if (timeline) {
+      timeline.replaceChildren(...data.experience.map(renderTimelineItem));
+      if (data.education) timeline.append(renderEducation(data.education));
     }
-    if (projectGrid) {
-      projectGrid.replaceChildren(...data.projects.map(renderProjectCard));
-    }
-    if (otherProjects) {
-      otherProjects.replaceChildren(...data.otherProjects.map(renderOtherProject));
-    }
+    if (more) more.replaceChildren(...data.moreBuilds.map(renderMoreBuild));
   }
-
   function initScrollReveal() {
     const elements = $$('.reveal');
     if (!elements.length) return;
@@ -378,96 +442,89 @@
     }, { passive: true });
   }
 
-  function revealGroupChildren(group) {
-    const cards = $$('.experience-card, .project-card, .other-project-item', group);
-    cards.forEach((card, index) => {
-      card.style.transitionDelay = index * 90 + 'ms';
-      card.classList.add('revealed');
-    });
-  }
-
-  function initStaggerCards() {
-    const groups = $$('.experience-list, .project-grid, .other-projects');
-    if (!groups.length) return;
-
+  // Children of [data-stagger] fade in one after another when the group enters view.
+  function initStagger() {
+    const groups = $$('[data-stagger]');
     if (!('IntersectionObserver' in window)) {
-      groups.forEach(revealGroupChildren);
+      groups.forEach((group) => group.classList.add('in-view'));
       return;
     }
 
-    groups.forEach((group) => {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            const cards = $$('.experience-card, .project-card, .other-project-item', entry.target);
-            if (entry.isIntersecting) {
-              cards.forEach((card, index) => {
-                card.style.transitionDelay = index * 90 + 'ms';
-                card.classList.add('revealed');
-              });
-            } else {
-              cards.forEach((card) => {
-                card.style.transitionDelay = '';
-                card.classList.remove('revealed');
-              });
-            }
-          });
-        },
-        { threshold: 0.05 }
-      );
-      observer.observe(group);
-    });
-  }
-
-  function initTechStagger() {
-    const container = $('.tech-pills');
-    if (!container) return;
-
-    if (!('IntersectionObserver' in window)) {
-      $$('.tech-pill', container).forEach((pill) => pill.classList.add('revealed'));
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          const pills = $$('.tech-pill', entry.target);
-          if (entry.isIntersecting) {
-            pills.forEach((pill, index) => {
-              pill.style.transitionDelay = index * 55 + 'ms';
-              pill.classList.add('revealed');
-            });
-          } else {
-            pills.forEach((pill) => {
-              pill.style.transitionDelay = '';
-              pill.classList.remove('revealed');
-            });
-          }
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        Array.from(entry.target.children).forEach((child, index) => {
+          child.style.transitionDelay = Math.min(index, 10) * 70 + 'ms';
         });
-      },
-      { threshold: 0.2 }
-    );
-    observer.observe(container);
+        entry.target.classList.add('in-view');
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.08 });
+
+    groups.forEach((group) => observer.observe(group));
   }
 
-  function initScrollIndicator() {
-    const indicator = $('.scroll-indicator');
-    if (!indicator) return;
+  // Plays muted loop videos and CSS visuals only while they are visible.
+  function initInViewMedia() {
+    const items = $$('[data-inview-play], .tile-visual--pcbs, .tile-visual--mobilespec');
+    if (!('IntersectionObserver' in window)) return;
 
-    let ticking = false;
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        const el = entry.target;
+        el.classList.toggle('is-playing', entry.isIntersecting);
+        if (el.tagName !== 'VIDEO') return;
+        if (entry.isIntersecting) {
+          el.play().catch(() => {});
+        } else {
+          el.pause();
+        }
+      });
+    }, { threshold: 0.25 });
 
-    function updateIndicator() {
-      indicator.style.opacity = String(Math.max(0, 1 - window.scrollY / 300));
-      ticking = false;
-    }
-
-    window.addEventListener('scroll', () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(updateIndicator);
-    }, { passive: true });
+    items.forEach((item) => observer.observe(item));
   }
 
+  // Counts hero stats up from zero once. Values keep their prefix and suffix, e.g. "7k+".
+  function initCountUp() {
+    const stats = $$('[data-count]');
+    if (!stats.length || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    stats.forEach((el) => {
+      const target = parseFloat(el.dataset.count);
+      const decimals = (el.dataset.count.split('.')[1] || '').length;
+      const suffix = el.dataset.suffix || '';
+      const start = performance.now();
+      const duration = 1400;
+
+      function frame(now) {
+        const t = Math.min(1, (now - start) / duration);
+        const eased = 1 - Math.pow(1 - t, 3);
+        el.textContent = (target * eased).toFixed(decimals) + suffix;
+        if (t < 1) requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    });
+  }
+
+  function initCopyEmail() {
+    $$('[data-copy]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const value = button.dataset.copy;
+        const done = () => {
+          button.classList.add('copied');
+          button.setAttribute('aria-label', 'Copied');
+          window.setTimeout(() => {
+            button.classList.remove('copied');
+            button.setAttribute('aria-label', 'Copy email address');
+          }, 1600);
+        };
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(value).then(done, () => {});
+        }
+      });
+    });
+  }
   function initActiveNav() {
     const sections = $$('section[id], .scroll-section[id]');
     const navLinks = $$('.nav-link');
@@ -902,9 +959,10 @@
     initScrollReveal();
     initSmoothScroll();
     initNavScroll();
-    initStaggerCards();
-    initTechStagger();
-    initScrollIndicator();
+    initStagger();
+    initInViewMedia();
+    initCountUp();
+    initCopyEmail();
     initActiveNav();
     initDetailPage();
     initLightbox();

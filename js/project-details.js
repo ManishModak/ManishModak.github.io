@@ -1,318 +1,303 @@
 /**
  * Central portfolio content source.
  *
- * Cards and detail pages are generated from this file so the same project or
- * experience is not duplicated across index.html and the detail renderer.
+ * main.js renders the work grid, experience timeline, "more builds" list and
+ * the full-screen detail pages from this file, so content lives in one place.
+ *
+ * Project fields:
+ * - size: bento tile size ('xl' 2x2, 'wide' 2x1, 'sm' 1x1).
+ * - visual: what the tile shows ({ type: 'video' | 'youtube' | 'pcbs' | 'mobilespec' }).
+ * - metric: optional headline number shown on the tile.
+ * - detail: optional full-screen case study; tiles without one link out instead.
  */
 (function () {
   'use strict';
+
+  const YT = (id) => 'https://youtu.be/' + id;
 
   const PORTFOLIO_DATA = {
     experience: [
       {
         id: 'ourora',
         role: 'Founding Engineer',
-        organization: 'Ourora',
+        organization: 'Ourora Expressions',
         organizationUrl: 'https://ourora.in',
-        duration: 'Feb 2026 \u2013 Present',
-        summary: 'Leading Flutter development for Android and iOS at a privacy-first couples app. Owning architecture decisions for encrypted chat, voice/video, and shared media vault systems.',
-        tags: ['Flutter', 'Dart', 'WebRTC', 'Encryption', 'Firebase'],
-        links: [
-          { label: 'App Store', url: 'https://apps.apple.com/us/app/ourora-connect/id6759134873', icon: 'apple' },
-          { label: 'Google Play', url: 'https://play.google.com/store/apps/details?id=com.ourora.connect', icon: 'play' },
-          { label: 'Launch X Post', url: 'https://x.com/0p3nsky_/status/2055249561841795282', icon: 'twitter' }
+        duration: 'Feb 2026 – Present',
+        current: true,
+        points: [
+          'Took the Flutter and Node.js codebase from alpha to production on iOS and Android, now at 7,000+ downloads.',
+          'Resolved 50+ post-alpha issues, improving performance and feature reliability by about 30%.',
+          'Own architecture and delivery for encrypted chat, the shared media vault, on-device ML and Firebase performance.'
         ],
-        detail: {
-          title: 'Founding Engineer',
-          subtitle: 'Ourora',
-          description: 'Leading Flutter development for Android and iOS at a privacy-first couples app, in close collaboration with the founder. Owning architecture decisions for encrypted chat, voice/video, and shared media vault systems.',
-          sections: [
-            {
-              title: 'Why This Matters',
-              body: 'Intimate communication should be genuinely private. Traditional messaging apps often do not provide strong, opt-in privacy boundaries for couples. We wanted to build a secure space where intimate chat, calls, and shared memories are encrypted and private by design.'
-            },
-            {
-              title: 'Core Focus and Features',
-              items: [
-                'Architected end-to-end encrypted messaging systems and shared media vaults.',
-                'Designed and integrated WebRTC-based real-time voice and video calling.',
-                'Collaborated closely with the founder to set technical roadmap and product strategy.',
-                'Shipped rapid weekly iterations from initial wireframes to a launched beta app.'
-              ]
-            }
-          ],
-          links: [
-            { label: 'App Store', url: 'https://apps.apple.com/us/app/ourora-connect/id6759134873', icon: 'apple' },
-            { label: 'Google Play', url: 'https://play.google.com/store/apps/details?id=com.ourora.connect', icon: 'play' },
-            { label: 'Launch X Post', url: 'https://x.com/0p3nsky_/status/2055249561841795282', icon: 'twitter' },
-            { label: 'Website', url: 'https://ourora.in', icon: 'external' }
-          ]
-        }
+        tags: ['Flutter', 'Riverpod', 'Node.js', 'Firebase', 'WebRTC', 'E2E Encryption']
       },
       {
         id: 'khwaaish',
-        role: 'Lead Flutter Developer',
+        role: 'Mobile Application Developer (Contract)',
         organization: 'Khwaaish AI / Eastri',
         organizationUrl: 'https://www.khwaaish.com/',
-        duration: 'Oct 2025 \u2013 Present',
-        summary: 'Building a personal AI agent mobile app for autonomous ordering, booking, and purchasing, while also improving a local laundry services app.',
-        tags: ['Flutter', 'AI Agents', 'System Design', 'API Integration'],
-        links: [
-          { label: 'Website', url: 'https://www.khwaaish.com/', icon: 'external' }
+        duration: 'Oct 2025 \u2013 Sep 2026',
+        points: [
+          'Built the mobile app for a personal AI agent that orders, books and buys across apps on the user’s behalf.',
+          'Shipped fixes and optimisations for Eastri, a beta laundry app connecting local shops with customers.'
         ],
-        detail: {
-          title: 'Lead Flutter Developer',
-          subtitle: 'Khwaaish AI / Eastri',
-          description: 'Developing a personal AI agent mobile application for autonomous cross-app booking and purchasing, and maintaining a laundry services app.',
-          sections: [
-            {
-              title: 'Why This Matters',
-              body: 'Autonomous AI agents are normally restricted to CLI tools or web consoles. Khwaaish brings that power directly into a consumer mobile experience, letting users instruct an agent to order, book, or buy across multiple platforms.'
-            },
-            {
-              title: 'Core Focus and Features',
-              items: [
-                'Khwaaish AI: Architected a mobile app integrating multi-service APIs for autonomous AI bookings.',
-                'Designed system flows enabling local execution of scheduled prompts.',
-                'Eastri: Optimizing a laundry services app connecting local service providers with customers.',
-                'Worked with the founder to shape product strategy, system design, and sprint execution.'
-              ]
-            }
-          ],
-          links: [
-            { label: 'Website', url: 'https://www.khwaaish.com/', icon: 'external' },
-            { label: 'Khwaaish AI', url: 'https://www.linkedin.com/company/khwaaish/', icon: 'external' },
-            { label: 'Eastri', url: 'https://www.linkedin.com/company/eastri/', icon: 'external' }
-          ]
-        }
+        tags: ['Flutter', 'AI Agents', 'API Integration']
       },
       {
         id: 'sociante',
         role: 'SDE (Flutter) Intern',
         organization: 'Sociante Pvt Ltd',
         organizationUrl: 'https://drive.google.com/file/d/1NO2Im8o_qOnMwfTwqbFCPNMqVFYMAkYi/view?usp=sharing',
-        duration: 'Oct 2024 \u2013 Apr 2025',
-        summary: 'Enhanced user engagement and operational efficiency through customer and merchant apps for an automated parking management system.',
-        tags: ['Flutter', 'Google Maps API', 'Razorpay SDK', 'Figma'],
-        links: [
-          { label: 'Certificate', url: 'https://drive.google.com/file/d/1NO2Im8o_qOnMwfTwqbFCPNMqVFYMAkYi/view?usp=sharing', icon: 'external' }
+        duration: 'Oct 2024 – Apr 2025',
+        points: [
+          'Delivered 40+ screens from Figma across customer and merchant apps for an automated parking system.',
+          'Integrated 20+ APIs including Razorpay and ANPR, plus Google Maps plaza search. Engagement up 20%, operational efficiency up 15%.'
         ],
-        detail: {
-          title: 'SDE (Flutter) Intern',
-          subtitle: 'Sociante Pvt Ltd',
-          description: 'Enhanced user engagement by 20% and operational efficiency by 15% through customer and merchant apps with more than 40 screens for an automated parking management system.',
-          sections: [
-            {
-              title: 'Why This Matters',
-              body: 'Navigating, parking, and checking out at crowded venues is friction-filled. The goal was to build a merchant-customer ecosystem where parking spaces are discoverable in real time, payments are handled seamlessly, and tickets are fully digitized.'
-            },
-            {
-              title: 'Core Focus and Features',
-              items: [
-                'Crafted more than 40 responsive UI screens in Flutter based on custom Figma templates.',
-                'Integrated Google Maps API for plaza search, location status, and navigation routing.',
-                'Engineered backend integration for vehicle tracking and payment ticketing.',
-                'Integrated Razorpay SDK for seamless, cashless ticket checkout.'
-              ]
-            }
-          ],
-          links: [
-            { label: 'Internship Certificate', url: 'https://drive.google.com/file/d/1NO2Im8o_qOnMwfTwqbFCPNMqVFYMAkYi/view?usp=sharing', icon: 'external' }
-          ]
-        }
+        tags: ['Flutter', 'Google Maps', 'Razorpay', 'Figma']
       }
     ],
 
+    education: {
+      school: 'International Institute of Information Technology, Pune',
+      degree: 'B.E. in Information Technology',
+      duration: '2025',
+      note: 'CGPA 8.39 / 10'
+    },
+
     projects: [
       {
-        id: 'parallax-connect',
-        title: 'Parallax Connect',
-        badge: 'Hackathon Winner',
-        duration: 'Jan 2026',
-        summary: 'Winner at Gradient Network Hackathon 2026. Mobile app for local AI with chat, vision/OCR, and web search capabilities.',
-        tags: ['Flutter', 'Dart', 'Python', 'FastAPI', 'Local AI', 'OCR'],
+        id: 'ourora-connect',
+        title: 'Ourora Connect',
+        kicker: 'Production app · Founding Engineer',
+        size: 'xl',
+        metric: { value: '7k+', label: 'downloads on iOS & Android' },
+        summary: 'A private app for couples. End-to-end encrypted chat, a shared memories vault, nudges and calls. Built and shipped from alpha to the stores.',
+        tags: ['Flutter', 'Riverpod', 'WebRTC', 'E2E Encryption', 'Firebase'],
+        visual: { type: 'video', src: 'images/ourora/demo-loop.mp4', poster: 'images/ourora/demo-poster.jpg', fit: 'contain' },
         links: [
-          { label: 'Source', url: 'https://github.com/ManishModak/parallax-connect-mobile', icon: 'github' },
-          { label: 'YT Demo', url: 'https://youtu.be/1G5gAEA_tz8', icon: 'demo' }
+          { label: 'App Store', url: 'https://apps.apple.com/us/app/ourora-connect/id6759134873', icon: 'apple' },
+          { label: 'Google Play', url: 'https://play.google.com/store/apps/details?id=com.ourora.connect', icon: 'play' }
         ],
         detail: {
-          subtitle: 'Hackathon Winner',
-          description: 'Winner at Gradient Network Hackathon 2026. A mobile app for local AI featuring chat, vision/OCR, and web search capabilities, routing processing securely between mobile and server.',
+          subtitle: 'Founding Engineer · Ourora Expressions',
+          duration: 'Feb 2026 – Present',
+          description: 'Ourora is one private app made for just the two of you. No public profile, no groups, no forwards. I lead the Flutter app for iOS and Android with the founder, from architecture to store releases.',
           sections: [
             {
-              title: 'Why I Built This',
-              body: 'Running open-source LLMs locally on your home GPU is powerful, but it normally pins you to your desktop. I built Parallax Connect as a personal, secure mobile bridge so you can leave your local machine running AI models and access them from your phone without relying on proprietary cloud backends.'
+              title: 'Why it matters',
+              body: 'Your phone is full of people, and the photos and messages that matter most get lost between them. Ourora gives a couple one space where chat, calls and shared memories are encrypted and private by design.'
             },
             {
-              title: 'Core Problem',
-              body: 'Traditional AI assistants operate on centralized cloud infrastructure, meaning conversations and document contents are uploaded to third-party servers. Parallax Connect keeps data local by routing connections through a password-protected FastAPI middleware tunnel directly to your local GPU.'
-            },
-            {
-              title: 'System Architecture',
-              body: '1. Mobile Frontend (Flutter): Premium UI with real-time SSE chat streaming, vision capture, history export, and terminal QR scanner connection.\n2. Middleware Server (FastAPI): Coordinates Google/Brave query routing, PDF parsing through PyMuPDF, and hybrid OCR management.\n3. Local GPU Inference Engine (Parallax / Ollama): Serves open-source LLMs such as Llama 3 and Phi 3 on your own hardware.'
-            },
-            {
-              title: 'Technical Implementation and Stack',
-              body: 'Flutter and Dart handle the cross-platform mobile client, local state, markdown rendering, on-device ML Kit OCR, and responsive styling. Python and FastAPI run the lightweight host server with SSE streaming, scraper pipelines, and document extraction. Docker plus Ngrok/Localtunnel expose the local server securely with password authentication.'
+              title: 'What I built',
+              items: [
+                'End-to-end encrypted 1:1 messaging with a sixteen-word secure phrase for key recovery.',
+                'Memories: a shared, encrypted photo vault with albums and smart albums.',
+                'WebRTC voice and video calling, one-tap nudges and home-screen widgets.',
+                'Took the codebase from alpha to production and fixed 50+ post-alpha issues, about a 30% reliability gain.'
+              ]
             }
           ],
           media: [
-            { url: 'images/parallax-connect/architecture.png', caption: 'System architecture flow diagram' },
-            { url: 'images/parallax-connect/Qr_plus_normal_chat.mp4', caption: 'Scanning QR code to launch mobile chat' },
-            { url: 'images/parallax-connect/private_chat.mp4', caption: 'Local streaming chat in action' },
-            { url: 'images/parallax-connect/settings.mp4', caption: 'Middleware settings and mode configuration' },
-            { url: 'images/parallax-connect/export.mp4', caption: 'Exporting history and options' }
+            { url: 'images/ourora/launch-film.mp4', caption: 'Launch film' },
+            { url: 'images/ourora/demo.mp4', caption: 'Product walkthrough on iPhone and Android' }
           ],
           links: [
-            { label: 'GitHub Source', url: 'https://github.com/ManishModak/parallax-connect-mobile', icon: 'github' },
-            { label: 'YouTube Demo', url: 'https://youtu.be/1G5gAEA_tz8', icon: 'demo' }
-          ]
-        }
-      },
-      {
-        id: 'necro-pet',
-        title: 'Necro-Pet',
-        badge: 'Desktop Virtual Pet',
-        duration: 'Jan 2026',
-        summary: 'Desktop virtual pet that gamifies coding. Build streaks, level up your pet, and make development sessions more engaging.',
-        tags: ['Electron', 'TypeScript', 'Node.js', 'Pixel Art', 'MCP'],
-        links: [
-          { label: 'Source', url: 'https://github.com/ManishModak/necro-pet', icon: 'github' },
-          { label: 'YT Demo', url: 'https://youtu.be/VSRB3CIGBws', icon: 'demo' }
-        ],
-        detail: {
-          title: 'Necro-Pet: Undead Coding Companion',
-          subtitle: 'Desktop Virtual Pet',
-          description: 'Desktop virtual pet that gamifies your coding workflow: file saves feed the pet, neglect causes it to die.',
-          sections: [
-            {
-              title: 'Why I Built This',
-              body: 'Writing code for hours can get lonely and repetitive. I wanted to add visual progression and fun feedback, so I built Necro-Pet as a lightweight companion that reacts to real filesystem saves.'
-            },
-            {
-              title: 'Core Problem',
-              body: 'Traditional virtual pets are separated from a developer workflow. Necro-Pet links health and evolution stage to filesystem events such as Git commits and file saves, transforming coding activity into a pet-raising loop.'
-            },
-            {
-              title: 'System Architecture',
-              body: '1. Desktop App (Electron + React): Renders a retro 8-bit companion frame with CRT-inspired visual effects.\n2. File Watcher Daemon: Monitors local workspace directories for saves, builds, and code additions, converting them into food and experience points.\n3. Open-Meteo Weather Integration: Synchronizes the pet environment with real-world weather conditions.'
-            },
-            {
-              title: 'Technical Implementation and Stack',
-              body: 'Electron enables the overlay companion. TypeScript and React render state-driven pixel animations. MCP and Open-Meteo connect the companion environment to real-world weather, while Node.js filesystem APIs perform low-overhead workspace monitoring.'
-            }
-          ],
-          media: [
-            { url: 'images/necro-pet/demo-optimized.mp4', caption: 'Necro-Pet companion active on desktop' },
-            { url: 'images/necro-pet/egg.mp4', caption: 'Egg stage: resting and waiting for filesystem saves to hatch' },
-            { url: 'images/necro-pet/larva.mp4', caption: 'Larva stage: wiggling and crawling companion' },
-            { url: 'images/necro-pet/beast.mp4', caption: 'Beast stage: evolved pet for high activity' },
-            { url: 'images/necro-pet/ghost.mp4', caption: 'Ghost stage: when you stop saving files, it dies and haunts you' }
-          ],
-          links: [
-            { label: 'GitHub Source', url: 'https://github.com/ManishModak/necro-pet', icon: 'github' },
-            { label: 'YouTube Demo', url: 'https://youtu.be/VSRB3CIGBws', icon: 'demo' }
-          ]
-        }
-      },
-      {
-        id: 'data-hive',
-        title: 'Data Hive',
-        badge: 'Containerized Emulation',
-        duration: 'Late 2025',
-        summary: 'Reverse-engineered a browser extension and reimplemented it to run on Docker. Self-hosted data collection without the browser dependency.',
-        tags: ['Docker', 'Node.js', 'Web Scraping', 'Docker Compose'],
-        links: [
-          { label: 'Source', url: 'https://github.com/ManishModak/data_hive', icon: 'github' }
-        ],
-        detail: {
-          subtitle: 'Containerized Emulation',
-          description: 'Reverse-engineered a browser extension and containerized it to run headless on Docker.',
-          sections: [
-            {
-              title: 'Why I Built This',
-              body: 'Some browser-extension tools require keeping a full GUI browser open continuously, which consumes unnecessary RAM and CPU. I wanted a cleaner way to run a specific extension workflow headless on a home server.'
-            },
-            {
-              title: 'Core Problem',
-              body: 'Eliminating resource-heavy browser windows while retaining data-scraping capabilities.'
-            },
-            {
-              title: 'System Architecture',
-              body: 'The project emulates the browser-websocket handshake through a headless Node.js client running inside Docker.'
-            },
-            {
-              title: 'Technical Implementation and Stack',
-              body: 'Built using Docker, Node.js, WebSockets, and Docker Compose.'
-            }
-          ],
-          links: [
-            { label: 'GitHub Source', url: 'https://github.com/ManishModak/data_hive', icon: 'github' }
+            { label: 'App Store', url: 'https://apps.apple.com/us/app/ourora-connect/id6759134873', icon: 'apple' },
+            { label: 'Google Play', url: 'https://play.google.com/store/apps/details?id=com.ourora.connect', icon: 'play' },
+            { label: 'Launch post', url: 'https://x.com/0p3nsky_/status/2055249561841795282', icon: 'twitter' },
+            { label: 'Website', url: 'https://ourora.in', icon: 'external' }
           ]
         }
       },
       {
         id: 'pcbuildsage',
         title: 'PCBuildSage',
-        badge: 'Open Source',
-        duration: 'Active Development',
-        summary: 'Open-source AI agent harness & PC part picker with local retailer price scraping, deterministic hardware rules engine, and multi-LLM support.',
-        tags: ['Next.js', 'React', 'TypeScript', 'Python', 'Crawl4AI', 'SQLite', 'LLMs', 'CLI'],
+        kicker: 'Open source · Live demo',
+        size: 'wide',
+        summary: 'Plan a PC in plain language from parts in stock at Indian retailers today. An AI consultant picks parts, code checks compatibility and does the maths.',
+        tags: ['Next.js 15', 'TypeScript', 'Python', 'Crawl4AI', 'SQLite', 'Multi-LLM'],
+        visual: { type: 'pcbs' },
         links: [
+          { label: 'Live demo', url: 'https://pcbuildsage.onrender.com/', icon: 'external' },
           { label: 'Source', url: 'https://github.com/ManishModak/pcbuildsage', icon: 'github' }
         ],
         detail: {
-          subtitle: 'Open-Source AI PC Part Picker & Compatibility Harness',
-          description: 'Compare live PC component prices from local retailers, chat with an AI consultant backed by a deterministic compatibility engine, and build PCs guaranteed free of hallucinations.',
+          subtitle: 'Open-source AI PC build planner',
+          duration: 'Active development',
+          description: 'Describe your budget and needs, get builds from parts in stock at Indian retailers, refreshed twice a day, with exact totals and compatibility checked by code, not the AI.',
           sections: [
             {
-              title: 'Why I Built This',
-              body: 'PCPartPicker does not cover local prices outside the US (such as India), static price aggregators offer zero compatibility guidance, and general LLMs hallucinate hardware specs. PCBuildSage fixes all three with local-first retailer scraping and deterministic rules enforcement.'
+              title: 'Why I built this',
+              body: 'A chatbot with web search only sees the pages its search happens to find, and it does the maths itself. Indian price-comparison sites see real stock, but you can’t tell them "I already own an RTX 4070, build a quiet PC around it". PCBuildSage does both.'
             },
             {
-              title: 'Core Architecture & Harness',
-              body: 'Functions as an Agent & Execution Harness orchestrating multi-LLM fallbacks (Gemini, Ollama, OpenRouter), tool calling, deterministic hardware rules validation (sockets, DDR generations, PSU wattage, physical clearance), and dynamic retailer scraping via Crawl4AI/Playwright.'
+              title: 'How it works',
+              items: [
+                'Scraper: Crawl4AI and Playwright workers pull listings from retailers like MDComputers, PrimeABGB and Vedant twice a day. A new retailer is one JSON profile, no code.',
+                'Agent harness: tool calling over the live SQLite catalog with fallback across Gemini, OpenRouter, Groq, Ollama or any OpenAI-compatible API.',
+                'Rules engine: deterministic checks for sockets, DDR generation, PSU wattage and physical clearance run before any build is shown. Anything unverified is marked as such.',
+                'Two interfaces: a web wizard and an interactive, scriptable CLI.'
+              ]
             },
             {
-              title: 'Technical Implementation and Stack',
-              body: 'Built using Next.js 15, React 19, TypeScript, Python 3.11+, SQLite, Crawl4AI, Tailwind CSS, and a scriptable CLI.'
+              title: 'Privacy',
+              body: 'No accounts and no tracking cookies. Bring your own key: it stays in your browser session and is never stored or logged on the server. Or run everything locally with your own model.'
             }
           ],
           links: [
-            { label: 'GitHub Source', url: 'https://github.com/ManishModak/pcbuildsage', icon: 'github' }
+            { label: 'Live demo', url: 'https://pcbuildsage.onrender.com/', icon: 'external' },
+            { label: 'GitHub', url: 'https://github.com/ManishModak/pcbuildsage', icon: 'github' }
           ]
         }
+      },
+      {
+        id: 'mobilespec',
+        title: 'MobileSpec',
+        kicker: 'Arm AI Optimization Challenge 2026',
+        size: 'sm',
+        summary: 'Phase-aware CPU thread tuning for llama.cpp on Arm Android. Doubles sustained decode speed on a mid-range phone.',
+        tags: ['C++', 'Android NDK', 'llama.cpp', 'Vulkan', 'Kotlin'],
+        visual: { type: 'mobilespec' },
+        links: [
+          { label: 'Source', url: 'https://github.com/ManishModak/llama-edge-android', icon: 'github' },
+          { label: 'Video', url: YT('1F8mwah88rA'), icon: 'demo' }
+        ],
+        detail: {
+          subtitle: 'Faster on-device LLM inference on Arm Android',
+          duration: '2026',
+          description: 'An evidence-led execution policy optimizer for llama.cpp on Arm Android. It discovers the CPU topology, measures prefill and decode separately, and removes spin-wait contention on big.LITTLE chips.',
+          sections: [
+            {
+              title: 'Results',
+              items: [
+                'Sustained decode: 5.39 to 11.18 tok/s, 2.07× faster (Llama 3.2 1B Q4_0, Redmi Note 14 5G).',
+                'Decode variance down 9.4×, from 16.1% to 1.71% CV.',
+                'Time to first token p99 cut from 2,319 ms to 965 ms. No change in memory.'
+              ]
+            },
+            {
+              title: 'The insight',
+              body: 'Prefill is compute-bound, so it gets all 8 threads. Decode is memory-bandwidth-bound: two big cores already saturate LPDDR4X, and running 8 threads makes the small cores spin inside ggml_barrier, heating the phone until it throttles. Splitting the policy to pp8 / tg2 removes the contention.'
+            }
+          ],
+          media: [
+            { url: 'images/mobilespec/phase-policy.webp', caption: 'Stock defaults vs phase-aware policy, 15 sustained runs' }
+          ],
+          links: [
+            { label: 'GitHub', url: 'https://github.com/ManishModak/llama-edge-android', icon: 'github' },
+            { label: 'YouTube', url: YT('1F8mwah88rA'), icon: 'demo' }
+          ]
+        }
+      },
+      {
+        id: 'parallax-connect',
+        title: 'Parallax Connect',
+        kicker: 'Hackathon winner',
+        size: 'sm',
+        summary: 'Your home GPU as a private AI cloud. Flutter app with streaming chat, vision/OCR and web search, tunnelled to a local model.',
+        tags: ['Flutter', 'FastAPI', 'Local LLMs', 'OCR'],
+        visual: { type: 'video', src: 'images/parallax-connect/private_chat.mp4', fit: 'contain' },
+        links: [
+          { label: 'Source', url: 'https://github.com/ManishModak/parallax-connect-mobile', icon: 'github' },
+          { label: 'Video', url: YT('1G5gAEA_tz8'), icon: 'demo' }
+        ],
+        detail: {
+          subtitle: 'Winner · Gradient Build Your Own AI Lab Hackathon',
+          duration: 'Oct – Nov 2025',
+          description: 'A mobile app for local AI with chat, vision/OCR and web search, routing securely between your phone and the model running on your own machine.',
+          sections: [
+            {
+              title: 'Why I built this',
+              body: 'Running open models on your own GPU is powerful, but it pins you to your desk. Parallax Connect is a secure mobile bridge: leave the model running at home and use it from your phone, without a third-party cloud seeing your data.'
+            },
+            {
+              title: 'Architecture',
+              body: '1. Flutter client: SSE chat streaming, camera capture, on-device ML Kit OCR, history export, QR pairing.\n2. FastAPI middleware: search routing, PDF parsing with PyMuPDF, hybrid OCR.\n3. Inference: Parallax or Ollama serving open models on your own hardware, exposed through a password-protected tunnel.'
+            }
+          ],
+          media: [
+            { url: 'images/parallax-connect/Qr_plus_normal_chat.mp4', caption: 'Scan a QR code to pair and start chatting' },
+            { url: 'images/parallax-connect/private_chat.mp4', caption: 'Streaming chat from a local model' },
+            { url: 'images/parallax-connect/settings.mp4', caption: 'Middleware settings and modes' },
+            { url: 'images/parallax-connect/export.mp4', caption: 'Exporting history' },
+            { url: 'images/parallax-connect/architecture.webp', caption: 'System architecture' }
+          ],
+          links: [
+            { label: 'GitHub', url: 'https://github.com/ManishModak/parallax-connect-mobile', icon: 'github' },
+            { label: 'YouTube', url: YT('1G5gAEA_tz8'), icon: 'demo' }
+          ]
+        }
+      },
+      {
+        id: 'necro-pet',
+        title: 'Necro-Pet',
+        kicker: 'Kiroween 2025',
+        size: 'wide',
+        summary: 'A desktop pet that lives on your commits. File saves feed it, neglect kills it, and it haunts you.',
+        tags: ['Electron', 'React', 'TypeScript', 'MCP'],
+        visual: { type: 'video', src: 'images/necro-pet/demo-optimized.mp4', fit: 'cover' },
+        links: [
+          { label: 'Source', url: 'https://github.com/ManishModak/necro-pet', icon: 'github' },
+          { label: 'Video', url: YT('VSRB3CIGBws'), icon: 'demo' }
+        ],
+        detail: {
+          title: 'Necro-Pet: Undead Coding Companion',
+          subtitle: 'Desktop virtual pet',
+          duration: 'Dec 2025 – Jan 2026',
+          description: 'A desktop virtual pet that gamifies coding: file saves feed it, neglect causes it to die.',
+          sections: [
+            {
+              title: 'How it works',
+              body: '1. Electron + React overlay renders an 8-bit companion with CRT scanlines.\n2. A file-watcher daemon turns saves and commits into food and XP.\n3. An Open-Meteo MCP integration syncs the pet’s world with your real weather.'
+            }
+          ],
+          media: [
+            { url: 'images/necro-pet/demo-optimized.mp4', caption: 'Necro-Pet on the desktop' },
+            { url: 'images/necro-pet/egg.mp4', caption: 'Egg: waiting for your first saves' },
+            { url: 'images/necro-pet/larva.mp4', caption: 'Larva' },
+            { url: 'images/necro-pet/beast.mp4', caption: 'Beast: evolved through high activity' },
+            { url: 'images/necro-pet/ghost.mp4', caption: 'Ghost: stop saving and it haunts you' }
+          ],
+          links: [
+            { label: 'GitHub', url: 'https://github.com/ManishModak/necro-pet', icon: 'github' },
+            { label: 'YouTube', url: YT('VSRB3CIGBws'), icon: 'demo' }
+          ]
+        }
+      },
+      {
+        id: 'whisper-village',
+        title: 'Whisper Village',
+        kicker: 'Cerebras × Gemma hackathon',
+        size: 'wide',
+        summary: 'A 2D RPG village where NPCs keep memories and trust, gossip to each other, and answer at Cerebras speed.',
+        tags: ['React 19', 'Phaser', 'Fastify', 'Cerebras'],
+        visual: { type: 'youtube', id: 'p1vI7Kpj5s0' },
+        links: [
+          { label: 'Source', url: 'https://github.com/ManishModak/gemma-cerebras', icon: 'github' },
+          { label: 'Video', url: YT('p1vI7Kpj5s0'), icon: 'demo' }
+        ]
       }
     ],
 
-    otherProjects: [
-      {
-        title: 'Smart India Hackathon 2023',
-        description: 'Disaster management app with Flutter and Firebase',
-        url: 'https://github.com/ManishModak/Smart-India-Hackathon-2023'
-      },
-      {
-        title: 'Flutter Driver App',
-        description: 'Driver app implementation',
-        url: 'https://github.com/ManishModak/flutter_driver_app'
-      },
-      {
-        title: 'Synq Web Portal',
-        description: 'Web portal project',
-        url: 'https://github.com/ManishModak/synq-web-portal'
-      }
+    // Compact list under the grid. Only public links: private repos 404 for visitors.
+    moreBuilds: [
+      { title: 'Gestalt', description: 'A design memory layer that keeps AI-generated UI on your design system.', label: 'Video', url: YT('GLRwsT3wRa4') },
+      { title: 'UpcycleAI', description: 'Six Gemini models turn recyclables into DIY projects. Gemini 3 hackathon.', label: 'Video', url: YT('K6ifq7mveio') },
+      { title: 'MT7902 Linux driver', description: 'WiFi and Bluetooth for the MediaTek MT7902 card on Linux, packaged with DKMS.', label: 'GitHub', url: 'https://github.com/ManishModak/mt7902_driver' },
+      { title: 'Data Hive', description: 'Reverse-engineered a browser extension to run headless in Docker.', label: 'GitHub', url: 'https://github.com/ManishModak/data_hive' },
+      { title: 'Smart India Hackathon 2023', description: 'Disaster management app with Flutter and Firebase.', label: 'GitHub', url: 'https://github.com/ManishModak/Smart-India-Hackathon-2023' }
     ]
   };
 
-  function normalizeItem(item, category) {
+  function normalizeItem(item) {
     const detail = item.detail || {};
     return {
       ...detail,
       ...item,
-      category,
-      title: detail.title || item.title || item.role,
-      subtitle: detail.subtitle || item.subtitle || item.organization || item.badge || '',
-      duration: detail.duration || item.duration || '',
+      category: 'project',
+      title: detail.title || item.title,
+      subtitle: detail.subtitle || item.kicker || '',
+      duration: detail.duration || '',
       description: detail.description || item.summary || '',
       sections: detail.sections || [],
       media: detail.media || [],
@@ -321,11 +306,8 @@
   }
 
   const detailById = {};
-  PORTFOLIO_DATA.experience.forEach((item) => {
-    detailById[item.id] = normalizeItem(item, 'experience');
-  });
   PORTFOLIO_DATA.projects.forEach((item) => {
-    detailById[item.id] = normalizeItem(item, 'project');
+    if (item.detail) detailById[item.id] = normalizeItem(item);
   });
 
   window.PORTFOLIO_DATA = PORTFOLIO_DATA;

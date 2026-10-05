@@ -3,23 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Manish Modak — Flutter Developer, Tech & AI Enthusiast</title>
-  <meta name="description" content="Portfolio of Manish Modak. Flutter developer, tech & AI enthusiast, curious human. Building things that matter.">
+  <title>Manish Modak · Flutter & AI Engineer</title>
+  <meta name="description" content="Manish Modak, Founding Engineer at Ourora. I ship production Flutter apps (7k+ downloads) and build AI tools grounded in real data, like PCBuildSage and MobileSpec.">
   <meta name="author" content="Manish Modak">
-  <meta name="theme-color" content="#0a0a0f">
+  <meta name="theme-color" content="#07080d">
+  <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
 
-  <!-- Open Graph -->
-  <meta property="og:title" content="Manish Modak — Portfolio">
-  <meta property="og:description" content="Flutter developer, tech & AI enthusiast, curious human. Building things that matter.">
+  <!-- Open Graph / social previews -->
+  <meta property="og:title" content="Manish Modak · Flutter & AI Engineer">
+  <meta property="og:description" content="Founding Engineer at Ourora (7k+ downloads). Builder of PCBuildSage, MobileSpec and Parallax Connect.">
   <meta property="og:type" content="website">
+  <meta property="og:url" content="https://manishmodak.github.io/">
+  <meta property="og:image" content="https://manishmodak.github.io/images/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@techdevmanish">
 
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Styles -->
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/detail.css">
+
+  <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/" } }
+  </script>
 </head>
 <body>
 
@@ -28,183 +36,160 @@
 
   <div class="content-wrapper">
 
-    <!-- Navigation -->
     <nav class="nav" id="nav" aria-label="Primary navigation">
-      <a href="#" class="nav-logo">mm.</a>
+      <a href="#" class="nav-logo">mm<span>.</span></a>
       <ul class="nav-links">
-        <li><a href="#about" class="nav-link">About</a></li>
-        <li><a href="#stack" class="nav-link">Stack</a></li>
-        <li><a href="#contact" class="nav-link">Contact</a></li>
+        <li><a href="#work" class="nav-link">Work</a></li>
         <li><a href="#experience" class="nav-link">Experience</a></li>
-        <li><a href="#projects" class="nav-link">Projects</a></li>
+        <li><a href="#skills" class="nav-link">Skills</a></li>
+        <li><a href="#about" class="nav-link">About</a></li>
+        <li><a href="#contact" class="nav-link">Contact</a></li>
       </ul>
+      <a href="https://drive.google.com/file/d/1DjU2AdDEz0kz-gb9yD11cXYC-bKsegRI/view?usp=sharing" target="_blank" rel="noopener" class="nav-cta">Resume</a>
     </nav>
 
     <!-- Hero -->
     <section class="hero" id="hero">
-      <div class="hero-content">
-        <p class="hero-greeting">Hi, I'm</p>
-        <h1 class="hero-name">Manish Modak</h1>
-        <p class="hero-tagline">
-          Flutter Developer <span>&middot;</span> Tech & AI Enthusiast <span>&middot;</span> Curious Human
-        </p>
-        <div class="hero-links">
-          <a href="https://linkedin.com/in/manish-modak-dev" target="_blank" rel="noopener" class="hero-link" id="link-linkedin">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
-            LinkedIn
-          </a>
-          <a href="mailto:manishm.techdev@gmail.com" class="hero-link" id="link-email">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-            Email
-          </a>
-          <a href="https://www.kaggle.com/manishmodak" target="_blank" rel="noopener" class="hero-link" id="link-kaggle">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.825 23.859a.848.848 0 0 1-.424-.107L12.32 19.2l-1.484 1.537.022 4.124a.848.848 0 0 1-.533.784.85.85 0 0 1-.936-.183L6.863 22.93a.848.848 0 0 1-.248-.6V.848A.848.848 0 0 1 7.463 0h1.696a.85.85 0 0 1 .605.252l8.598 8.598a.848.848 0 0 1-.001 1.2l-3.97 3.957 5.83 5.83a.848.848 0 0 1-.396 1.422z"/></svg>
-            Kaggle
-          </a>
-          <a href="https://twitter.com/techdevmanish" target="_blank" rel="noopener" class="hero-link" id="link-twitter">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-            Twitter/X
-          </a>
-          <a href="https://drive.google.com/file/d/1DjU2AdDEz0kz-gb9yD11cXYC-bKsegRI/view?usp=sharing" target="_blank" rel="noopener" class="hero-link" id="link-resume">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-            Resume
-          </a>
-        </div>
-        <div class="hero-building">
-          <span class="hero-building-label">Actively building:</span>
-          <a href="#detail/ourora" class="hero-building-link" data-detail-open="ourora">Ourora</a>
-          <span class="hero-building-separator">&middot;</span>
-          <a href="#detail/khwaaish" class="hero-building-link" data-detail-open="khwaaish">Khwaaish AI</a>
-          <span class="hero-building-separator">&middot;</span>
-          <a href="https://miccheck.live" target="_blank" rel="noopener" class="hero-building-link">miccheck.live</a>
-        </div>
-      </div>
-      <div class="scroll-indicator">
-        <span>Scroll</span>
-        <div class="scroll-line"></div>
-      </div>
-    </section>
+      <div class="hero-grid">
+        <div class="hero-content">
+          <h1 class="hero-name">Manish Modak</h1>
+          <p class="hero-pitch">I ship production <strong>Flutter</strong> apps and build <strong>AI tools</strong> grounded in real data.</p>
+          <p class="hero-sub">Founding Engineer at <a href="#work" class="hero-inline-link">Ourora</a>. Previously Khwaaish AI and Sociante.</p>
 
-    <!-- About / Info Section -->
-    <section id="about">
-      <div class="section-inner section-inner--wide info-grid">
-        
-        <!-- Left Column: About Me -->
-        <div class="info-col-left">
-          <span class="section-label reveal">01 / About</span>
-          <h2 class="section-title reveal">About Me</h2>
-          <div class="about-text-column reveal">
-            <p class="about-lead">I build software driven by real-world purpose. Rather than memorizing templates, I go deep into solving actual problems.</p>
-            <p>I don't grind LeetCode, though I respect those who do. It's a solid way to sharpen problem-solving when you're actually thinking through the logic, not just memorizing patterns. My approach is different: I learn best when there's a real goal behind it. Give me a reason to pick something up and I'll go deep. Without that, I'd rather spend the time building something that matters to me.</p>
-            <p>I believe anything can be learned. There are no limits, only missing motivation. Always happy to help, always open to connect.</p>
+          <div class="hero-cta">
+            <a href="#work" class="btn btn--primary">
+              See my work
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+            </a>
+            <a href="https://github.com/ManishModak" target="_blank" rel="noopener" class="btn btn--ghost" aria-label="GitHub">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+              GitHub
+            </a>
+            <a href="https://linkedin.com/in/manish-modak-dev" target="_blank" rel="noopener" class="btn btn--ghost" aria-label="LinkedIn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+              LinkedIn
+            </a>
+            <a href="mailto:modakm.dev@gmail.com" class="btn btn--ghost" aria-label="Email">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+              Email
+            </a>
           </div>
 
+          <dl class="hero-stats">
+            <div class="stat"><dt>Ourora downloads</dt><dd><span data-count="7" data-suffix="k+">7k+</span></dd></div>
+            <div class="stat"><dt>faster on-device LLM decode</dt><dd><span data-count="2.07" data-suffix="×">2.07×</span></dd></div>
+            <div class="stat"><dt>Gradient AI Lab hackathon</dt><dd>Winner</dd></div>
+            <div class="stat"><dt>NVIDIA Nemotron challenge</dt><dd>Bronze</dd></div>
+          </dl>
         </div>
 
-        <!-- Right Column: Stack & Contact -->
-        <div class="info-col-right">
-          
-          <!-- Tech Stack Row -->
-          <div id="stack" class="scroll-section">
-            <span class="section-label reveal">02 / Stack</span>
-            <h2 class="section-title reveal">Tech Stack</h2>
-            <div class="tech-pills">
-              <span class="tech-pill">Flutter</span>
-              <span class="tech-pill">Dart</span>
-              <span class="tech-pill">Python</span>
-              <span class="tech-pill">Firebase</span>
-              <span class="tech-pill">Node.js</span>
-              <span class="tech-pill">React</span>
-              <span class="tech-pill">PostgreSQL</span>
-              <span class="tech-pill">Git</span>
-            </div>
+        <!-- Hero visual: CSS phone. js/hero3d.js moves #hero-canvas onto the hero for the WebGL backdrop. -->
+        <div class="hero-visual" id="hero-visual">
+          <canvas id="hero-canvas" aria-hidden="true"></canvas>
+          <div class="phone" aria-label="Ourora launch film">
+            <video class="phone-screen" src="images/ourora/launch-film.mp4" poster="images/ourora/launch-poster.jpg" autoplay muted loop playsinline preload="metadata"></video>
           </div>
+        </div>
+      </div>
+      <a href="#work" class="scroll-cue" aria-label="Scroll to work"><span></span></a>
+    </section>
 
-          <!-- Contact Row -->
-          <div id="contact" class="scroll-section">
-            <span class="section-label reveal">03 / Connect</span>
-            <h2 class="section-title reveal">Get in Touch</h2>
-            <div class="contact-grid">
-              <a href="https://linkedin.com/in/manish-modak-dev" target="_blank" rel="noopener" class="contact-item reveal" id="contact-linkedin">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
-                <div>
-                  <span class="contact-label">LinkedIn</span>
-                  manish-modak-dev
-                </div>
-              </a>
+    <!-- Work -->
+    <section id="work" class="section">
+      <div class="section-inner section-inner--wide">
+        <header class="section-head reveal">
+          <span class="section-label">01 / Work</span>
+          <h2 class="section-title">Things I've shipped</h2>
+          <p class="section-intro">Production apps, open-source tools and hackathon wins. Open any card for the full case study and demos.</p>
+        </header>
+        <div class="work-grid" id="work-grid" data-stagger></div>
 
-              <a href="mailto:manishm.techdev@gmail.com" class="contact-item reveal" id="contact-email">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-                <div>
-                  <span class="contact-label">Email</span>
-                  manishm.techdev@gmail.com
-                </div>
-              </a>
+        <h3 class="sub-title reveal">More builds</h3>
+        <div class="more-builds" id="more-builds" data-stagger></div>
+      </div>
+    </section>
 
-              <a href="https://github.com/ManishModak" target="_blank" rel="noopener" class="contact-item reveal" id="contact-github">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-                <div>
-                  <span class="contact-label">GitHub</span>
-                  @ManishModak
-                </div>
-              </a>
+    <!-- Experience -->
+    <section id="experience" class="section">
+      <div class="section-inner section-inner--wide split">
+        <header class="section-head reveal">
+          <span class="section-label">02 / Experience</span>
+          <h2 class="section-title">Where I've worked</h2>
+        </header>
+        <ol class="roles" id="timeline" data-stagger></ol>
+      </div>
+    </section>
 
-              <a href="https://www.kaggle.com/manishmodak" target="_blank" rel="noopener" class="contact-item reveal" id="contact-kaggle">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.825 23.859a.848.848 0 0 1-.424-.107L12.32 19.2l-1.484 1.537.022 4.124a.848.848 0 0 1-.533.784.85.85 0 0 1-.936-.183L6.863 22.93a.848.848 0 0 1-.248-.6V.848A.848.848 0 0 1 7.463 0h1.696a.85.85 0 0 1 .605.252l8.598 8.598a.848.848 0 0 1-.001 1.2l-3.97 3.957 5.83 5.83a.848.848 0 0 1-.396 1.422z"/></svg>
-                <div>
-                  <span class="contact-label">Kaggle</span>
-                  manishmodak
-                </div>
-              </a>
-
-              <a href="https://twitter.com/techdevmanish" target="_blank" rel="noopener" class="contact-item reveal" id="contact-twitter">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                <div>
-                  <span class="contact-label">Twitter/X</span>
-                  @techdevmanish
-                </div>
-              </a>
-            </div>
+    <!-- Skills -->
+    <section id="skills" class="section">
+      <div class="section-inner section-inner--wide">
+        <header class="section-head reveal">
+          <span class="section-label">03 / Skills</span>
+          <h2 class="section-title">What I work with</h2>
+          <p class="section-intro">Most of my experience is in Flutter, and I'm quick to pick up whatever a project needs.</p>
+        </header>
+        <div class="skills-grid" data-stagger>
+          <div class="skill-group">
+            <h3>Mobile</h3>
+            <ul><li class="core">Flutter</li><li class="core">Dart</li><li>Riverpod</li><li>Provider</li><li>GoRouter</li><li>Dio</li><li>WebRTC</li><li>Deep linking</li><li>Google Maps</li><li>Android NDK</li><li>Jetpack Compose</li></ul>
           </div>
-
+          <div class="skill-group">
+            <h3>Web & Backend</h3>
+            <ul><li class="core">Next.js</li><li class="core">TypeScript</li><li>React</li><li>Node.js</li><li>Fastify</li><li>Python</li><li>FastAPI</li><li>PostgreSQL</li><li>SQLite</li></ul>
+          </div>
+          <div class="skill-group">
+            <h3>AI & Systems</h3>
+            <ul><li class="core">LLM tool calling</li><li>Gemini</li><li>Ollama</li><li>OpenRouter</li><li class="core">llama.cpp</li><li>C++</li><li>Vulkan</li><li>Crawl4AI</li><li>Playwright</li></ul>
+          </div>
+          <div class="skill-group">
+            <h3>Cloud & Tools</h3>
+            <ul><li class="core">Firebase</li><li class="core">Supabase</li><li>AWS (Amplify, S3, CloudFront)</li><li>Cloud Run</li><li>Docker</li><li>Git</li><li>Figma</li><li>Cursor · Codex · OpenCode</li></ul>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Combined Experience & Projects Section -->
-    <section id="work-experience">
-      <div class="section-inner section-inner--wide work-grid">
-        
-        <!-- Left Column: Experience -->
-        <div id="experience" class="work-col scroll-section">
-          <span class="section-label reveal">04 / Experience</span>
-          <h2 class="section-title reveal">Professional Experience</h2>
-          <div class="experience-list" id="experience-list" aria-live="polite"></div>
+    <!-- About -->
+    <section id="about" class="section">
+      <div class="section-inner section-inner--wide split about">
+        <header class="section-head reveal">
+          <span class="section-label">04 / About</span>
+          <h2 class="section-title">I learn by building</h2>
+        </header>
+        <div class="about-text reveal">
+          <p class="about-lead">Give me a real problem and I'll go as deep as it takes.</p>
+          <p>That's how I ended up autotuning llama.cpp threads on Arm phones, packaging a Linux driver for my own WiFi card, and writing a PC part picker because nothing covered Indian retailers properly.</p>
+          <p>At work I care about the boring parts that make apps feel good: reliability, performance and the details people notice without knowing why. I believe anything can be learned. Always happy to help, always open to connect.</p>
         </div>
-
-        <!-- Right Column: Projects -->
-        <div id="projects" class="work-col scroll-section">
-          <span class="section-label reveal">05 / Work</span>
-          <h2 class="section-title reveal">Featured Projects</h2>
-          <div class="project-grid" id="project-grid" aria-live="polite"></div>
-        </div>
-
       </div>
     </section>
 
-    <!-- Other Projects -->
-    <section id="other-projects">
-      <div class="section-inner">
-        <span class="section-label reveal">06 / More</span>
-        <h2 class="section-title reveal">Other Projects</h2>
-        <div class="other-projects" id="other-projects-list" aria-live="polite"></div>
+    <!-- Contact -->
+    <section id="contact" class="section">
+      <div class="section-inner contact reveal">
+        <span class="section-label">05 / Contact</span>
+        <h2 class="contact-title">Let's build something <span class="muted">together.</span></h2>
+        <p class="section-intro">Hiring, collaborating or just curious? My inbox is open.</p>
+        <div class="contact-email">
+          <a href="mailto:modakm.dev@gmail.com" class="contact-email-link">modakm.dev@gmail.com</a>
+          <button type="button" class="copy-btn" data-copy="modakm.dev@gmail.com" aria-label="Copy email address">
+            <svg class="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <svg class="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+          </button>
+        </div>
+        <ul class="socials">
+          <li><a href="https://github.com/ManishModak" target="_blank" rel="noopener">GitHub</a></li>
+          <li><a href="https://linkedin.com/in/manish-modak-dev" target="_blank" rel="noopener">LinkedIn</a></li>
+          <li><a href="https://www.youtube.com/@zeinlethos" target="_blank" rel="noopener">YouTube</a></li>
+          <li><a href="https://www.kaggle.com/manishmodak" target="_blank" rel="noopener">Kaggle</a></li>
+          <li><a href="https://twitter.com/techdevmanish" target="_blank" rel="noopener">X / Twitter</a></li>
+          <li><a href="https://drive.google.com/file/d/1DjU2AdDEz0kz-gb9yD11cXYC-bKsegRI/view?usp=sharing" target="_blank" rel="noopener">Resume</a></li>
+        </ul>
       </div>
     </section>
 
-    <!-- Footer -->
     <footer class="footer">
-      <div class="footer-line"></div>
-      <p>Manish Modak &middot; 2026</p>
+      <p>Manish Modak · 2026 · Built by hand, no framework.</p>
     </footer>
 
   </div>
@@ -212,20 +197,14 @@
   <!-- Full-Screen Project Detail Page -->
   <div id="detail-page" class="detail-page" role="dialog" aria-modal="true" aria-labelledby="detail-title" aria-hidden="true" tabindex="-1">
     <div class="detail-page-inner">
-      <!-- Top bar with breadcrumbs and back -->
       <header class="detail-topbar" id="detail-topbar">
         <button class="detail-back-btn" id="detail-back" aria-label="Go back">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
           <span>Back</span>
         </button>
-        <nav class="detail-breadcrumbs" id="detail-breadcrumbs" aria-label="Breadcrumb">
-          <!-- Breadcrumbs injected dynamically -->
-        </nav>
+        <nav class="detail-breadcrumbs" id="detail-breadcrumbs" aria-label="Breadcrumb"></nav>
       </header>
-      <!-- Scrollable detail content -->
-      <main class="detail-content" id="detail-body">
-        <!-- Content injected dynamically -->
-      </main>
+      <main class="detail-content" id="detail-body"></main>
     </div>
   </div>
 
@@ -244,11 +223,11 @@
     <div class="lightbox-caption" id="lightbox-caption"></div>
     <div class="lightbox-counter" id="lightbox-counter"></div>
   </div>
-  <!-- Scripts -->
+
   <script src="js/noise.js"></script>
   <script src="js/flowfield.js"></script>
   <script src="js/project-details.js"></script>
   <script src="js/main.js"></script>
-
+  <script type="module" src="js/hero3d.js"></script>
 </body>
 </html>
