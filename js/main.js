@@ -3,8 +3,8 @@
  *
  * Responsibilities:
  * - Render the work grid, timeline and lists from js/project-details.js.
- * - Play loop videos and visuals only while visible; hero stat count-up; copy email.
- * - Manage scroll reveal, active navigation, and smooth scrolling.
+ * - Play loop videos and visuals only while visible; copy email.
+ * - Manage active navigation and smooth scrolling.
  * - Render the full-screen detail view without injecting untrusted text as HTML.
  * - Manage case study focus restoration, keyboard access, and history state.
  */
@@ -295,19 +295,16 @@
     tile.append(createTileVisual(item.visual));
 
     const body = createElement('div', { className: 'tile-body' });
-    body.append(createElement('span', { className: 'tile-kicker', text: item.kicker }));
     body.append(createElement('h3', { className: 'tile-title', text: item.title }));
+    if (item.context) body.append(createElement('p', { className: 'tile-context', text: item.context }));
     if (item.metric) {
       body.append(createElement('p', { className: 'tile-metric' }, [
         createElement('strong', { text: item.metric.value }),
         ' ' + item.metric.label
       ]));
     }
+    // The stack lives in the case study, not on the card.
     body.append(createElement('p', { className: 'tile-desc', text: item.summary }));
-
-    if (item.tags && item.tags.length) {
-      body.append(createElement('p', { className: 'tile-stack', text: item.tags.join(' \u00b7 ') }));
-    }
 
     const links = renderLinks(item.links);
     if (hasDetail) links.append(createDetailButton(item.id, 'Case study'));
@@ -335,7 +332,7 @@
       main.append(list);
     }
     if (stack && stack.length) {
-      main.append(createElement('p', { className: 'role-stack', text: stack.join(' \u00b7 ') }));
+      main.append(createElement('p', { className: 'role-stack', text: stack.join(', ') }));
     }
     row.append(main);
     return row;
@@ -346,7 +343,7 @@
   }
 
   function renderEducation(edu) {
-    return renderRole(edu.duration, edu.degree, edu.school + ' \u00b7 ' + edu.note, null, null, null, false);
+    return renderRole(edu.duration, edu.degree, edu.school + ', ' + edu.note, null, null, null, false);
   }
 
   function renderMoreBuild(item) {
@@ -378,30 +375,6 @@
     }
     if (more) more.replaceChildren(...data.moreBuilds.map(renderMoreBuild));
   }
-  function initScrollReveal() {
-    const elements = $$('.reveal');
-    if (!elements.length) return;
-
-    if (!('IntersectionObserver' in window)) {
-      elements.forEach((element) => element.classList.add('revealed'));
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          entry.target.classList.toggle('revealed', entry.isIntersecting);
-        });
-      },
-      { threshold: 0.1, rootMargin: '0px 0px -60px 0px' }
-    );
-
-    elements.forEach((element, index) => {
-      element.style.transitionDelay = (index % 3) * 80 + 'ms';
-      observer.observe(element);
-    });
-  }
-
   function initSmoothScroll() {
     $$('a[href^="#"]').forEach((link) => {
       link.addEventListener('click', (event) => {
@@ -436,28 +409,6 @@
     }, { passive: true });
   }
 
-  // Children of [data-stagger] fade in one after another when the group enters view.
-  function initStagger() {
-    const groups = $$('[data-stagger]');
-    if (!('IntersectionObserver' in window)) {
-      groups.forEach((group) => group.classList.add('in-view'));
-      return;
-    }
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        Array.from(entry.target.children).forEach((child, index) => {
-          child.style.transitionDelay = Math.min(index, 10) * 70 + 'ms';
-        });
-        entry.target.classList.add('in-view');
-        observer.unobserve(entry.target);
-      });
-    }, { threshold: 0.08 });
-
-    groups.forEach((group) => observer.observe(group));
-  }
-
   // Plays muted loop videos and CSS visuals only while they are visible.
   function initInViewMedia() {
     const items = $$('[data-inview-play], .tile-visual--pcbs, .tile-visual--mobilespec');
@@ -477,28 +428,6 @@
     }, { threshold: 0.25 });
 
     items.forEach((item) => observer.observe(item));
-  }
-
-  // Counts hero stats up from zero once. Values keep their prefix and suffix, e.g. "7k+".
-  function initCountUp() {
-    const stats = $$('[data-count]');
-    if (!stats.length || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-    stats.forEach((el) => {
-      const target = parseFloat(el.dataset.count);
-      const decimals = (el.dataset.count.split('.')[1] || '').length;
-      const suffix = el.dataset.suffix || '';
-      const start = performance.now();
-      const duration = 1400;
-
-      function frame(now) {
-        const t = Math.min(1, (now - start) / duration);
-        const eased = 1 - Math.pow(1 - t, 3);
-        el.textContent = (target * eased).toFixed(decimals) + suffix;
-        if (t < 1) requestAnimationFrame(frame);
-      }
-      requestAnimationFrame(frame);
-    });
   }
 
   function initCopyEmail() {
@@ -757,7 +686,10 @@
       (detail.sections || []).forEach((section) => content.append(renderDetailSection(section)));
 
       const next = renderNext(detail);
-      if (next) content.append(next);
+      if (next) {
+        // js/sea.js swims a creature through this slot, towards the next case study.
+        content.append(createElement('div', { className: 'cs-signoff', attrs: { 'aria-hidden': 'true' } }), next);
+      }
       return content;
     }
 
@@ -879,12 +811,9 @@
 
   function init() {
     renderDataDrivenContent();
-    initScrollReveal();
     initSmoothScroll();
     initNavScroll();
-    initStagger();
     initInViewMedia();
-    initCountUp();
     initCopyEmail();
     initActiveNav();
     initDetailPage();

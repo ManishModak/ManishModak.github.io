@@ -1,16 +1,16 @@
 /* ============================================
-   Portfolio styles: dark theme over the flow-field canvas.
+   Portfolio styles: dark ink-blue theme over the ASCII sea (js/sea.js).
    Case study page styles live in detail.css.
    ============================================ */
 
 /* ---------- Tokens ---------- */
 :root {
-  /* Must match flowfield.js background so trails fade into the page. */
-  --bg-primary: #0a0a0f;
-  --bg-card: rgba(16, 17, 26, 0.72);
-  --bg-card-hover: rgba(22, 24, 36, 0.82);
-  --bg-inset: rgba(6, 7, 12, 0.7);
-  --bg-nav-scrolled: rgba(10, 10, 15, 0.78);
+  /* Deep-water ink blue. Must match flowfield.js background if the trails come back. */
+  --bg-primary: #060b12;
+  --bg-card: rgba(12, 19, 29, 0.72);
+  --bg-card-hover: rgba(17, 26, 39, 0.82);
+  --bg-inset: rgba(4, 8, 13, 0.7);
+  --bg-nav-scrolled: rgba(6, 11, 18, 0.78);
   --border-subtle: rgba(140, 210, 220, 0.1);
   --border-hover: rgba(140, 210, 220, 0.28);
 
@@ -137,6 +137,22 @@ ol {
   pointer-events: none;
 }
 
+/* Above the flow field, behind the content. */
+#sea-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+
+#sea-canvas.ready {
+  opacity: 1;
+}
+
 .content-wrapper {
   position: relative;
   z-index: 1;
@@ -254,16 +270,6 @@ body.detail-open .content-wrapper {
   margin-bottom: 44px;
 }
 
-.section-label {
-  display: inline-block;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--text-accent);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  margin-bottom: 12px;
-}
-
 .section-title {
   font-family: var(--font-heading);
   font-size: clamp(2rem, 4.4vw, 3rem);
@@ -299,7 +305,7 @@ body.detail-open .content-wrapper {
   font-weight: 500;
   border: 1px solid var(--border-subtle);
   color: var(--text-primary);
-  background: rgba(16, 17, 26, 0.6);
+  background: rgba(12, 19, 29, 0.6);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   transition: transform var(--transition-base), border-color var(--transition-base), background var(--transition-base), box-shadow var(--transition-base);
@@ -318,13 +324,13 @@ body.detail-open .content-wrapper {
 
 .btn--primary {
   border: 0;
-  color: #0a0a0f;
+  color: #060b12;
   font-weight: 600;
   background: var(--text-primary);
 }
 
 .btn--primary:hover {
-  color: #0a0a0f;
+  color: #060b12;
   background: #ffffff;
 }
 
@@ -376,11 +382,6 @@ body.detail-open .content-wrapper {
   color: var(--text-secondary);
 }
 
-.hero-pitch strong {
-  color: var(--text-primary);
-  font-weight: 600;
-}
-
 .hero-sub {
   margin-top: 12px;
   font-size: 0.95rem;
@@ -392,46 +393,23 @@ body.detail-open .content-wrapper {
   border-bottom: 1px solid var(--border-hover);
 }
 
+.hero-proof {
+  margin-top: 20px;
+  max-width: 34em;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.hero-proof .hero-inline-link {
+  color: var(--text-primary);
+}
+
 .hero-cta {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 34px;
-}
-
-.hero-stats {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  margin-top: 52px;
-  max-width: 640px;
-}
-
-.stat:first-child {
-  padding-left: 0;
-  border-left: 0;
-}
-
-.stat {
-  display: flex;
-  flex-direction: column-reverse;
-  justify-content: flex-end;
-  gap: 4px;
-  padding: 2px 20px;
-  border-left: 1px solid var(--border-hover);
-}
-
-.stat dd {
-  font-family: var(--font-heading);
-  font-size: 1.6rem;
-  font-weight: 600;
-  line-height: 1.1;
-  color: var(--text-primary);
-}
-
-.stat dt {
-  font-size: 0.74rem;
-  line-height: 1.35;
-  color: var(--text-muted);
 }
 
 .hero-visual {
@@ -502,36 +480,6 @@ body.detail-open .content-wrapper {
   width: 100%;
   height: 100%;
   z-index: 0;
-}
-
-.scroll-cue {
-  position: absolute;
-  left: 50%;
-  bottom: 26px;
-  z-index: 1;
-  width: 24px;
-  height: 38px;
-  margin-left: -12px;
-  border: 1.5px solid var(--border-hover);
-  border-radius: 12px;
-}
-
-.scroll-cue span {
-  position: absolute;
-  top: 7px;
-  left: 50%;
-  width: 3px;
-  height: 7px;
-  margin-left: -1.5px;
-  border-radius: 2px;
-  background: var(--text-accent);
-  animation: scroll-cue 1.8s ease-in-out infinite;
-}
-
-@keyframes scroll-cue {
-  0% { opacity: 0; transform: translateY(0); }
-  40% { opacity: 1; }
-  100% { opacity: 0; transform: translateY(12px); }
 }
 
 /* ---------- Work bento grid ---------- */
@@ -649,7 +597,7 @@ body.detail-open .content-wrapper {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, transparent 50%, rgba(6, 7, 12, 0.6));
+  background: linear-gradient(180deg, transparent 50%, rgba(4, 8, 13, 0.6));
 }
 
 .tile-body {
@@ -662,16 +610,7 @@ body.detail-open .content-wrapper {
   min-width: 0;
 }
 
-.tile-kicker {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text-accent);
-}
-
 .tile-title {
-  margin-top: 6px;
   font-family: var(--font-heading);
   font-size: 1.35rem;
   font-weight: 600;
@@ -681,6 +620,13 @@ body.detail-open .content-wrapper {
 
 .tile--xl .tile-title {
   font-size: 1.9rem;
+}
+
+/* Where it was built or what it won, as a plain line under the title. */
+.tile-context {
+  margin-top: 4px;
+  font-size: 0.88rem;
+  color: var(--text-muted);
 }
 
 .tile-metric {
@@ -701,16 +647,6 @@ body.detail-open .content-wrapper {
   font-size: 0.92rem;
   color: var(--text-secondary);
   line-height: 1.6;
-}
-
-
-
-.tile-stack {
-  margin-top: 14px;
-  font-family: var(--font-mono);
-  font-size: 0.74rem;
-  line-height: 1.6;
-  color: var(--text-muted);
 }
 
 .tile-links {
@@ -1078,8 +1014,7 @@ a.role-org:hover {
 
 .role-stack {
   margin-top: 14px;
-  font-family: var(--font-mono);
-  font-size: 0.74rem;
+  font-size: 0.85rem;
   color: var(--text-muted);
 }
 
@@ -1142,10 +1077,6 @@ a.role-org:hover {
   align-items: center;
 }
 
-.muted {
-  color: var(--text-muted);
-}
-
 .contact .section-intro {
   margin-left: auto;
   margin-right: auto;
@@ -1157,6 +1088,7 @@ a.role-org:hover {
   font-weight: 700;
   line-height: 1.02;
   letter-spacing: -0.04em;
+  text-wrap: balance;
 }
 
 .contact-email {
@@ -1167,7 +1099,7 @@ a.role-org:hover {
   padding: 8px 8px 8px 22px;
   border-radius: 999px;
   border: 1px solid var(--border-hover);
-  background: rgba(16, 17, 26, 0.75);
+  background: rgba(12, 19, 29, 0.75);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   max-width: 100%;
@@ -1232,7 +1164,7 @@ a.role-org:hover {
   font-size: 0.86rem;
   color: var(--text-secondary);
   border: 1px solid var(--border-subtle);
-  background: rgba(16, 17, 26, 0.6);
+  background: rgba(12, 19, 29, 0.6);
   transition: color var(--transition-base), border-color var(--transition-base);
 }
 
@@ -1247,34 +1179,8 @@ a.role-org:hover {
   text-align: center;
   font-size: 0.8rem;
   color: var(--text-muted);
-}
-
-/* ---------- Reveal & stagger ---------- */
-.reveal {
-  opacity: 0;
-  transform: translateY(24px);
-  transition: opacity var(--transition-slow), transform var(--transition-slow);
-}
-
-.reveal.revealed {
-  opacity: 1;
-  transform: none;
-}
-
-[data-stagger] > * {
-  opacity: 0;
-  transform: translateY(28px);
-  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), border-color var(--transition-base), box-shadow var(--transition-base);
-}
-
-[data-stagger].in-view > * {
-  opacity: 1;
-  transform: none;
-}
-
-[data-stagger].in-view > .tile:hover {
-  transform: translateY(-4px);
-  transition-delay: 0s !important;
+  /* Sits on the ASCII seabed (js/sea.js); a soft halo keeps it readable. */
+  text-shadow: 0 0 6px var(--bg-primary), 0 0 12px var(--bg-primary), 0 0 2px var(--bg-primary);
 }
 
 /* ---------- Responsive ---------- */
@@ -1321,22 +1227,6 @@ a.role-org:hover {
 
   .phone-screen {
     border-radius: 22px;
-  }
-
-  .hero-stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: 20px;
-  }
-
-  .stat,
-  .stat:first-child {
-    padding: 14px 0;
-    border-left: 0;
-    border-top: 1px solid var(--border-subtle);
-  }
-
-  .scroll-cue {
-    display: none;
   }
 }
 
@@ -1424,8 +1314,7 @@ a.role-org:hover {
 
 @media (hover: none) {
   .tile:hover,
-  .btn:hover,
-  [data-stagger].in-view > .tile:hover {
+  .btn:hover {
     transform: none;
   }
 }

@@ -7,6 +7,7 @@
  * Project fields:
  * - size: bento tile size ('xl' 2x2, 'wide' 2x1, 'sm' 1x1).
  * - visual: what the tile shows ({ type: 'video' | 'youtube' | 'pcbs' | 'mobilespec' }).
+ * - context: optional plain line under the tile title: where it was built or what it won.
  * - metric: optional headline number shown on the tile.
  * - detail: optional full-screen case study; tiles without one link out instead.
  *   detail.highlights: optional key numbers shown under the case study header.
@@ -71,7 +72,7 @@
       {
         id: 'ourora-connect',
         title: 'Ourora Connect',
-        kicker: 'Production app · Founding Engineer',
+        context: 'Built as founding engineer at Ourora',
         size: 'xl',
         metric: { value: '7k+', label: 'downloads on iOS & Android' },
         summary: 'A private app for couples. End-to-end encrypted chat, a shared memories vault, nudges and calls. Built and shipped from alpha to the stores.',
@@ -120,7 +121,6 @@
       {
         id: 'pcbuildsage',
         title: 'PCBuildSage',
-        kicker: 'Open source · Live demo',
         size: 'wide',
         summary: 'Plan a PC in plain language from parts in stock at Indian retailers today. An AI consultant picks parts, code checks compatibility and does the maths.',
         tags: ['Next.js 15', 'TypeScript', 'Python', 'Crawl4AI', 'SQLite', 'Multi-LLM'],
@@ -166,7 +166,7 @@
       {
         id: 'mobilespec',
         title: 'MobileSpec',
-        kicker: 'Arm AI Optimization Challenge 2026',
+        context: 'Built for the Arm AI Optimization Challenge 2026',
         size: 'sm',
         summary: 'Phase-aware CPU thread tuning for llama.cpp on Arm Android. Doubles sustained decode speed on a mid-range phone.',
         tags: ['C++', 'Android NDK', 'llama.cpp', 'Vulkan', 'Kotlin'],
@@ -210,7 +210,7 @@
       {
         id: 'parallax-connect',
         title: 'Parallax Connect',
-        kicker: 'Hackathon winner',
+        context: 'Won the Gradient AI Lab hackathon',
         size: 'sm',
         summary: 'Your home GPU as a private AI cloud. Flutter app with streaming chat, vision/OCR and web search, tunnelled to a local model.',
         tags: ['Flutter', 'FastAPI', 'Local LLMs', 'OCR'],
@@ -249,7 +249,7 @@
       {
         id: 'black-box',
         title: 'Black Box',
-        kicker: 'Graph Hacks 2026 · FalkorDB',
+        context: 'Graph Hacks 2026 entry, built with Divyam on FalkorDB',
         size: 'wide',
         summary: 'Finds warning signs in aircraft maintenance records before an accident. An agent searches one graph of NTSB accidents and FAA reports through MCP tools.',
         tags: ['FalkorDB', 'MCP', 'TypeScript', 'Next.js', 'three.js'],
@@ -302,7 +302,7 @@
       {
         id: 'necro-pet',
         title: 'Necro-Pet',
-        kicker: 'Kiroween 2025',
+        context: 'Built for Kiroween 2025',
         size: 'wide',
         summary: 'A desktop pet that lives on your commits. File saves feed it, neglect kills it, and it haunts you.',
         tags: ['Electron', 'React', 'TypeScript', 'MCP'],
@@ -354,7 +354,7 @@
       ...item,
       category: 'project',
       title: detail.title || item.title,
-      subtitle: detail.subtitle || item.kicker || '',
+      subtitle: detail.subtitle || item.context || '',
       duration: detail.duration || '',
       description: detail.description || item.summary || '',
       sections: detail.sections || [],

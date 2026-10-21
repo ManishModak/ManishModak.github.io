@@ -39,7 +39,7 @@
   align-items: center;
   gap: 20px;
   padding: 16px 40px;
-  background: rgba(10, 10, 15, 0.82);
+  background: rgba(6, 11, 18, 0.82);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border-subtle);
@@ -424,6 +424,27 @@
   color: var(--text-primary);
   text-align: left;
   cursor: pointer;
+}
+
+/* Strip js/sea.js swims a creature through; stays collapsed when the sea is off. */
+.cs-signoff {
+  height: 150px;
+  margin-top: 64px;
+  pointer-events: none;
+}
+
+.cs-signoff:empty {
+  display: none;
+}
+
+.cs-signoff canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.cs-signoff:not(:empty) + .cs-next {
+  margin-top: 0;
 }
 
 .cs-next-label {

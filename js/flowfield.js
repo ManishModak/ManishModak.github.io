@@ -17,7 +17,7 @@
   'use strict';
 
   const BASE = {
-    background: '#0a0a0f',
+    background: '#060b12',
     noiseScale: 0.003,
     noiseSpeed: 0.0003,
     particleSpeed: 1.2,
@@ -262,7 +262,7 @@
 
   function render(ticks) {
     const fadeAlpha = 1 - Math.pow(1 - settings.trailFadePerTick, ticks || 1);
-    ctx.fillStyle = 'rgba(10, 10, 15, ' + fadeAlpha + ')';
+    ctx.fillStyle = 'rgba(6, 11, 18, ' + fadeAlpha + ')';
     ctx.fillRect(0, 0, width, height);
 
     ticksSinceCleanup += ticks || 1;
