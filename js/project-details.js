@@ -247,6 +247,59 @@
         }
       },
       {
+        id: 'black-box',
+        title: 'Black Box',
+        kicker: 'Graph Hacks 2026 · FalkorDB',
+        size: 'wide',
+        summary: 'Finds warning signs in aircraft maintenance records before an accident. An agent searches one graph of NTSB accidents and FAA reports through MCP tools.',
+        tags: ['FalkorDB', 'MCP', 'TypeScript', 'Next.js', 'three.js'],
+        visual: { type: 'video', src: 'images/blackbox/unroll.mp4', poster: 'images/blackbox/unroll-poster.jpg', fit: 'cover' },
+        links: [
+          { label: 'Source', url: 'https://github.com/divyam2356/GraphsHackathon', icon: 'github' },
+          { label: 'Video', url: YT('knjB0BusVGM'), icon: 'demo' }
+        ],
+        detail: {
+          subtitle: 'Graph Hacks 2026 (FalkorDB × WeMakeDevs) · built with Divyam',
+          duration: 'Oct 2026',
+          highlights: [
+            { value: '225k', label: 'FAA maintenance reports' },
+            { value: '4,235', label: 'NTSB accident investigations' },
+            { value: '26', label: 'MCP tools, each a fixed Cypher query' }
+          ],
+          description: 'Black Box joins public NTSB accident data and FAA maintenance reports in one FalkorDB graph, so an investigator or an agent can ask: before this accident, did the aircraft or its fleet report trouble at that spot? It shows warning signs worth a review, never causes.',
+          sections: [
+            {
+              title: 'The case: Southwest 812',
+              body: 'In April 2011 a Southwest 737 lost a five-foot strip of its roof at 34,000 feet. A year earlier, mechanics on the same aircraft had reported two cracked clips on stringer S-4L, one of them 24 inches from where the skin later tore. Across the fleet, 737 Classics reporting skin cracks on stringer 4 went from 9 to 18 to 31 aircraft between 2008 and 2010. S-4L wasn’t the line with the most cracks, but by rise it ranked 2nd of 37, three months before the accident.'
+            },
+            {
+              title: 'How it works',
+              items: [
+                'One graph of about 250k nodes and 490k edges: reports, accidents, aircraft and locations, joined by tail number and by place on the aircraft, down to a stringer and a 20-inch section.',
+                'The agent never writes Cypher. It calls 26 MCP tools, each a fixed query: multi-hop joins, shortest paths, connected components, full-text search, and a time filter that hides everything after the investigation date.',
+                'The Board: a crack heat map on a 3D 737 drawn in three.js that unrolls into a flat map, a date slider, every agent call with its Cypher and timing, and an evidence graph.',
+                'People stay in charge. The agent can draft a failure mode with its evidence, but it has no tool to approve one. A person decides, and who, when and why are stored in the graph.'
+              ]
+            },
+            {
+              title: 'Testing it honestly',
+              body: 'One case proves nothing, so we backtested every NTSB mechanical event that had earlier reports. A naive match looked 2.87× better than chance. Closing two leaks, the event’s own report and each aircraft family reporting the same systems, dropped it to 0.88×, no better than chance. So Black Box hands a person leads to check, not predictions.'
+            }
+          ],
+          media: [
+            { url: 'images/blackbox/unroll.mp4', poster: 'images/blackbox/unroll-poster.jpg', caption: 'Skin-crack reports on a 3D 737, unrolled into the fleet map' },
+            { url: 'images/blackbox/replay.mp4', caption: 'Fleet replay: each frame is the 12 months before the date, up to the accident' },
+            { url: 'images/blackbox/board.webp', caption: 'The Board: crack map, an agent run with every MCP call, and the evidence graph' },
+            { url: 'images/blackbox/story-backtest.webp', caption: 'Backtest against 1,000 shuffles: once the leaks are closed, the lift is gone' },
+            { url: 'images/blackbox/story-approval.webp', caption: 'The agent drafts a failure mode, only a person can approve it' }
+          ],
+          links: [
+            { label: 'GitHub', url: 'https://github.com/divyam2356/GraphsHackathon', icon: 'github' },
+            { label: 'YouTube', url: YT('knjB0BusVGM'), icon: 'demo' }
+          ]
+        }
+      },
+      {
         id: 'necro-pet',
         title: 'Necro-Pet',
         kicker: 'Kiroween 2025',
@@ -281,19 +334,6 @@
             { label: 'YouTube', url: YT('VSRB3CIGBws'), icon: 'demo' }
           ]
         }
-      },
-      {
-        id: 'whisper-village',
-        title: 'Whisper Village',
-        kicker: 'Cerebras × Gemma hackathon',
-        size: 'wide',
-        summary: 'A 2D RPG village where NPCs keep memories and trust, gossip to each other, and answer at Cerebras speed.',
-        tags: ['React 19', 'Phaser', 'Fastify', 'Cerebras'],
-        visual: { type: 'youtube', id: 'p1vI7Kpj5s0' },
-        links: [
-          { label: 'Source', url: 'https://github.com/ManishModak/gemma-cerebras', icon: 'github' },
-          { label: 'Video', url: YT('p1vI7Kpj5s0'), icon: 'demo' }
-        ]
       }
     ],
 
