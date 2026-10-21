@@ -37,7 +37,7 @@
       },
       {
         id: 'khwaaish',
-        role: 'Mobile Application Developer (Contract)',
+        role: 'Mobile Application Developer',
         organization: 'Khwaaish AI / Eastri',
         organizationUrl: 'https://www.khwaaish.com/',
         duration: 'Oct 2025 \u2013 Sep 2026',
