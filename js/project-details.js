@@ -29,8 +29,8 @@
         duration: 'Feb 2026 – Present',
         current: true,
         points: [
-          'Took the Flutter and Node.js codebase from alpha to production on iOS and Android, now at 7,000+ downloads.',
-          'Resolved 50+ post-alpha issues, improving performance and feature reliability by about 30%.',
+          'Took the Flutter and Node.js codebase from alpha to production on iOS and Android, now at 5,000+ downloads on Google Play.',
+          'Shipped 19 releases through 187 merged pull requests, and wrote 370+ test files in a suite of 4,400 automated tests.',
           'Own architecture and delivery for encrypted chat, the shared media vault, on-device ML and Firebase performance.'
         ],
         tags: ['Flutter', 'Riverpod', 'Node.js', 'Firebase', 'WebRTC', 'E2E Encryption']
@@ -74,7 +74,7 @@
         title: 'Ourora Connect',
         context: 'Built as founding engineer at Ourora',
         size: 'xl',
-        metric: { value: '7k+', label: 'downloads on iOS & Android' },
+        metric: { value: '5K+', label: 'downloads on Google Play' },
         summary: 'A private app for couples. End-to-end encrypted chat, a shared memories vault, nudges and calls. Built and shipped from alpha to the stores.',
         tags: ['Flutter', 'Riverpod', 'WebRTC', 'E2E Encryption', 'Firebase'],
         visual: { type: 'video', src: 'images/ourora/demo-loop.mp4', poster: 'images/ourora/demo-poster.jpg', fit: 'contain' },
@@ -86,9 +86,9 @@
           subtitle: 'Founding Engineer · Ourora Expressions',
           duration: 'Feb 2026 – Present',
           highlights: [
-            { value: '7k+', label: 'downloads on iOS and Android' },
-            { value: '50+', label: 'post-alpha issues resolved' },
-            { value: '~30%', label: 'better performance and reliability' }
+            { value: '5K+', label: 'downloads on Google Play' },
+            { value: '19', label: 'releases since March 2026' },
+            { value: '187', label: 'merged pull requests' }
           ],
           description: 'Ourora is one private app made for just the two of you. No public profile, no groups, no forwards. I lead the Flutter app for iOS and Android with the founder, from architecture to store releases.',
           sections: [
@@ -102,7 +102,7 @@
                 'End-to-end encrypted 1:1 messaging with a sixteen-word secure phrase for key recovery.',
                 'Memories: a shared, encrypted photo vault with albums and smart albums.',
                 'WebRTC voice and video calling, one-tap nudges and home-screen widgets.',
-                'Took the codebase from alpha to production and fixed 50+ post-alpha issues, about a 30% reliability gain.'
+                'Took the codebase from alpha to production: 19 releases and 187 merged pull requests since March 2026.'
               ]
             }
           ],
